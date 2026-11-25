@@ -1,13 +1,13 @@
 'use client';
-// 3. SERVICES SHOWCASE — sticky stage, pinned scenes x 100vh. 4. CURTAIN — the dark coda stays put
-// while the light section slides over it (see Curtain below).
+// 3. SERVICES SHOWCASE — sticky stage, pinned scenes x 100vh.
+// 4. CURTAIN — the stage stays pinned one more segment while the light section slides over it.
 import { useRef } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP, usePinScenes, fadeIn, MQ, EASE } from '@/lib/motion';
 import { GROUPS, SERVICES, serviceHref } from '@/content/services';
 import { Clay, ClayItem } from '@/components/clay/Clay';
 import { Magnetic } from '@/components/ui/Magnetic';
-import { Browser, Phone, Chat, NodeGraph, Agent, Dashboard, Serp, Payment, Changelog, Uptime } from './Mockups';
+import { Browser, Phone, Chat, NodeGraph, Agent, Dashboard, Serp, Payment, Changelog, Uptime, Monitor } from './Mockups';
 
 const KNOT: ClayItem[] = [{ kind: 'knot', at: [0, 0], size: 0.34, tilt: [0.6, 0, 0.3] }];
 
@@ -30,7 +30,7 @@ const SCENES = [
   <>
     <Changelog className="m1" />
     <Uptime className="m2" />
-    <Browser className="m3" src="/media/gapl-hero.jpg" url="gapl.143.lat" />
+    <Monitor className="m3" />
   </>,
 ];
 
@@ -39,23 +39,28 @@ export function ServicesShowcase() {
   const progress = useRef(0);
   const n = GROUPS.length;
 
-  usePinScenes(root, n, tl => {
+  // Pin = n scene segments + 1 curtain segment, during which the light section (pulled up by -100vh
+  // in CSS) slides over the still-pinned stage while it scales to 0.95 and dims to 60%.
+  usePinScenes(root, n + 1, tl => {
     const scenes = gsap.utils.toArray<HTMLElement>('.sc-scene', root.current);
     const bgs = gsap.utils.toArray<HTMLElement>('.sc-bg', root.current);
     gsap.set(scenes.slice(1), { autoAlpha: 0 });
     gsap.set(bgs.slice(1), { opacity: 0 });
-    tl.to({}, { duration: 0.25 }); // hold the first scene
+    // Scene k owns [k, k+1). Around each boundary b: mockups blur (max 4px) only in the outgoing and
+    // incoming 20%, copy crossfades within 15%, background crossfades within 20%. So every scene is
+    // fully sharp for the middle 60% of its segment.
     for (let i = 0; i < n - 1; i++) {
-      const at = 0.25 + i;
-      const out = scenes[i].querySelectorAll('.mk, .sc-copy');
-      const inn = scenes[i + 1].querySelectorAll('.mk, .sc-copy');
-      tl.to(out, { scale: 1.4, filter: 'blur(8px)', opacity: 0, duration: 0.5, stagger: 0.04 }, at)
-        .set(scenes[i], { autoAlpha: 0 }, at + 0.6)
-        .to(bgs[i + 1], { opacity: 1, duration: 0.6 }, at)
-        .set(scenes[i + 1], { autoAlpha: 1 }, at + 0.15)
-        .fromTo(inn, { scale: 0.7, filter: 'blur(8px)', opacity: 0 }, { scale: 1, filter: 'blur(0px)', opacity: 1, duration: 0.5, stagger: 0.04 }, at + 0.2)
-        .to({}, { duration: 0.25 }, at + 0.7);
+      const b = i + 1;
+      const [cur, next] = [scenes[i], scenes[i + 1]];
+      tl.set(next, { autoAlpha: 1 }, b - 0.2)
+        .to(cur.querySelectorAll('.mk'), { scale: 1.2, filter: 'blur(4px)', opacity: 0, duration: 0.2 }, b - 0.2)
+        .to(cur.querySelector('.sc-copy'), { opacity: 0, y: -20, duration: 0.075 }, b - 0.075)
+        .fromTo(bgs[b], { opacity: 0 }, { opacity: 1, duration: 0.2 }, b - 0.1)
+        .fromTo(next.querySelector('.sc-copy'), { opacity: 0, y: 20 }, { opacity: 1, y: 0, duration: 0.075 }, b)
+        .fromTo(next.querySelectorAll('.mk'), { scale: 0.85, filter: 'blur(4px)', opacity: 0 }, { scale: 1, filter: 'blur(0px)', opacity: 1, duration: 0.2 }, b)
+        .set(cur, { autoAlpha: 0 }, b + 0.2);
     }
+    tl.to('.sc-inner', { scale: 0.95, duration: 1 }, n).to('.sc-dim', { opacity: 0.4, duration: 1 }, n);
   }, { vhPerScene: 100, onUpdate: p => (progress.current = p), when: MQ.full });
 
   // Phones / reduced motion: scenes stack; each one just fades up as it arrives.
@@ -72,6 +77,7 @@ export function ServicesShowcase() {
   return (
     <section className="showcase dark" aria-labelledby="sc-title">
       <div ref={root} className="sc-stage">
+        <div className="sc-inner">
         <div className="sc-labels">
           <h2 id="sc-title">From idea to launch. In weeks.</h2>
           <p>13 services. One developer.</p>
@@ -96,34 +102,13 @@ export function ServicesShowcase() {
             ))}
           </div>
         </div>
+        <div className="sc-coda">
+          <p>One person from first call to launch. You talk to the person who builds it.</p>
+          <Magnetic><Link href="/work" className="btn btn-lav" data-title="Work">View work</Link></Magnetic>
+        </div>
+        </div>
+        <div className="sc-dim" aria-hidden />
       </div>
     </section>
-  );
-}
-
-/** Dark coda under the stage. It pins while the light section (next sibling) slides up over it. */
-export function CurtainCoda() {
-  const ref = useRef<HTMLDivElement>(null);
-  useGSAP(() => {
-    gsap.matchMedia(ref.current ?? undefined).add('(prefers-reduced-motion: no-preference)', () => {
-      // The light section (next sibling) rises over the pinned coda; underneath it scales to 0.95 and dims to 60%.
-      gsap.timeline({
-        defaults: { ease: EASE.scrub },
-        scrollTrigger: { trigger: ref.current, start: 'top top', end: '+=100%', pin: true, pinSpacing: false, scrub: true },
-      })
-        .to('.coda-inner', { scale: 0.95, duration: 1 }, 0)
-        .to('.coda-dim', { opacity: 0.4, duration: 1 }, 0);
-    });
-  }, { scope: ref });
-  return (
-    <div ref={ref} className="coda dark">
-      <div className="coda-inner">
-        <p className="coda-text">
-          One person from first call to launch: design, code, automation and the boring parts like hosting, analytics and handover. You talk to the person who builds it.
-        </p>
-        <Magnetic><Link href="/work" className="btn btn-lav" data-title="Work">View work</Link></Magnetic>
-      </div>
-      <div className="coda-dim" aria-hidden />
-    </div>
   );
 }

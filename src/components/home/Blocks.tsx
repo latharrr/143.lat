@@ -1,4 +1,5 @@
 // 7–9 + FAQ: process, pricing, proof and FAQ blocks (server components with light reveals).
+import Link from 'next/link';
 import { Reveal, Lines } from '@/components/ui/Reveal';
 import { CONTACT, FAQ, PRICING, PROCESS, PROOF, inr } from '@/content/site';
 
@@ -41,19 +42,34 @@ export function Pricing() {
 }
 
 export function Proof() {
+  // Placeholder testimonials show in dev only, so a pending quote can never ship.
+  const quotes = PROOF.testimonials.filter(t => !t.placeholder || process.env.NODE_ENV !== 'production');
   return (
     <Reveal as="section" className="block proof" aria-labelledby="pf-title">
       <p className="eyebrow rv" id="pf-title">Proof</p>
-      <p className="proof-big rv"><span>{PROOF.shipped}</span> products shipped</p>
-      <ul className="logo-row">
-        {PROOF.logos.map(l => <li key={l} className="rv">{l}</li>)}
+      <Link href="/work" className="proof-big rv" data-title="Work"><span>{PROOF.shipped}</span> products shipped <em>See the work →</em></Link>
+      <ul className="logo-row" aria-label="Teams I have built for">
+        {PROOF.logos.map(l => (
+          <li key={l.name} className="rv">
+            {l.src
+              // eslint-disable-next-line @next/next/no-img-element
+              ? <img src={l.src} alt={l.name} width={l.w} height={l.h} loading="lazy" decoding="async" />
+              : <span className="logo-word">{l.name}</span>}
+          </li>
+        ))}
       </ul>
-      {PROOF.testimonials.length > 0 && (
+      {quotes.length > 0 && (
         <div className="quotes">
-          {PROOF.testimonials.map(t => (
-            <figure key={t.name} className="quote rv">
+          {quotes.map((t, i) => (
+            <figure key={i} className={`quote rv ${t.placeholder ? 'is-placeholder' : ''}`}>
               <blockquote>“{t.quote}”</blockquote>
-              <figcaption>{t.name} · {t.role}</figcaption>
+              <figcaption>
+                {t.photo
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={t.photo} alt="" width={48} height={48} />
+                  : <span className="quote-photo" aria-hidden>{t.company[0]}</span>}
+                <span><b>{t.name}</b>{t.role}, {t.company}</span>
+              </figcaption>
             </figure>
           ))}
         </div>

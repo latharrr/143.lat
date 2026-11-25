@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { CONTACT, NAV } from '@/content/site';
 import { launched } from '@/content/services';
 import { Magnetic } from '@/components/ui/Magnetic';
+import { Year } from './Year';
 
 export function Footer() {
   return (
@@ -30,7 +31,10 @@ export function Footer() {
           {NAV.map(n => <Link key={n.href} className="u" href={n.href} data-title={n.label}>{n.label}</Link>)}
         </div>
       </div>
-      <p className="foot-small">© 2026 Deepanshu Lathar · Delhi, India · Websites, automation and AI agents</p>
+      <p className="foot-small">
+        <span>© <Year /> Deepanshu Lathar · Delhi, India</span>
+        <Link className="u" href="/privacy" data-title="Privacy">Privacy</Link>
+      </p>
     </footer>
   );
 }

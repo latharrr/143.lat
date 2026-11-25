@@ -9,10 +9,10 @@ import { LazyVideo } from '@/components/ui/LazyVideo';
 
 // Preview footage per service: real projects, captioned with the project's name.
 const PREVIEW: Record<string, [string, string]> = {
-  shopify: ['yp', 'YourProfessionals'], 'ai-agents': ['gapl', 'Gapl'], 'n8n-automation': ['intent', 'Picapool intents'],
+  shopify: ['yp', 'YourProfessionals'], 'ai-agents': ['proofmart', 'ProofMart'], 'n8n-automation': ['intent', 'Picapool intents'],
   'whatsapp-email-automation': ['air', 'Picapool air'], '3d-websites': ['lputv', 'LpuTV'], websites: ['tbv', 'TrustBridgeVerify'],
   'landing-pages': ['intent', 'Picapool intents'], apps: ['proofmart', 'ProofMart'], 'seo-performance': ['yp', 'YourProfessionals'],
-  scraping: ['gapl', 'Gapl'], 'workflow-optimisation': ['air', 'Picapool air'], 'payments-booking': ['proofmart', 'ProofMart'],
+  scraping: ['slspl', 'SLSPL Group'], 'workflow-optimisation': ['air', 'Picapool air'], 'payments-booking': ['proofmart', 'ProofMart'],
   maintenance: ['tbv', 'TrustBridgeVerify'],
 };
 const CLIPS = [...new Set(Object.values(PREVIEW).map(v => v[0]))];
@@ -24,14 +24,11 @@ export function ServiceList() {
   useGSAP(() => {
     const words = gsap.utils.toArray<HTMLElement>('.sl-item', root.current);
     if (isReduced()) return void fadeIn(words, root.current);
-    // Each word peaks when its centre crosses the viewport centre.
+    // One text layer per word: colour + weight peak as its centre crosses the viewport centre.
     words.forEach(w => {
-      const hot = w.querySelector('.sl-hot'), base = w.querySelector('.sl-base');
       gsap.timeline({ scrollTrigger: { trigger: w, start: 'top bottom', end: 'bottom top', scrub: true } })
-        .fromTo(hot, { opacity: 0 }, { opacity: 1, ease: 'power2.in', duration: 1 }, 0.25)
-        .fromTo(base, { opacity: 1 }, { opacity: 0, ease: 'power2.in', duration: 1 }, 0.25)
-        .to(hot, { opacity: 0, ease: 'power2.out', duration: 1 }, 1.25)
-        .to(base, { opacity: 1, ease: 'power2.out', duration: 1 }, 1.25)
+        .fromTo(w, { color: '#d6d4cf', fontWeight: 500 }, { color: '#1a1a1a', fontWeight: 600, ease: 'power2.in', duration: 1 }, 0.25)
+        .to(w, { color: '#d6d4cf', fontWeight: 500, ease: 'power2.out', duration: 1 }, 1.25)
         .to({}, { duration: 0.25 });
     });
 
@@ -76,8 +73,7 @@ export function ServiceList() {
           return (
             <li key={slug}>
               <Link className="sl-item" href={serviceHref(s)} data-slug={slug} data-title={s.name}>
-                <span className="sl-base">{s.name}</span>
-                <span className="sl-hot" aria-hidden>{s.name}</span>
+                {s.name}
               </Link>
             </li>
           );

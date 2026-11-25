@@ -16,7 +16,7 @@ export const CONTACT = {
   cal: 'https://cal.com/deepanshulathar/intro',
   whatsapp: `https://wa.me/918221016809?text=${waText}`,
   whatsappDisplay: '+91 82210 16809',
-  email: 'deepanshulathar@gmail.com',
+  email: 'hello@deepanshulathar.com',
   linkedin: 'https://www.linkedin.com/in/deepanshulathar',
   github: 'https://github.com/latharrr',
 };
@@ -56,12 +56,26 @@ export const PRICING = [
   { name: 'Monthly retainer', from: 8000, unit: '/month', note: 'Updates, monitoring, small features and a same-week response.' },
 ];
 
+export type Testimonial = { quote: string; name: string; role: string; company: string; photo?: string; placeholder?: boolean };
+export type Logo = { name: string; src?: string; w: number; h: number };
+
 export const PROOF = {
   shipped: 29,
-  // Text wordmarks of teams I've built for (not their logo files).
-  logos: ['Picapool', 'UniLyf', 'Spraykart', 'YourProfessionals', 'TrustBridgeVerify', 'SLSPL Group'],
-  // Add real quotes only, with permission. The section hides this block while it is empty.
-  testimonials: [] as { quote: string; name: string; role: string }[],
+  // Real logo files from each client's own site or repo. No file yet = text wordmark.
+  logos: [
+    { name: 'Picapool', src: '/logos/picapool.png', w: 551, h: 120 },
+    { name: 'YourProfessionals', src: '/logos/yourprofessionals.svg', w: 662, h: 377 },
+    { name: 'TrustBridgeVerify', src: '/logos/trustbridgeverify.svg', w: 1000, h: 200 },
+    { name: 'Spraykart', src: '/logos/spraykart.png', w: 480, h: 80 },
+    { name: 'SLSPL Group', w: 0, h: 0 },
+    { name: 'UniLyf', w: 0, h: 0 },
+  ] as Logo[],
+  // Placeholders render in dev only (see Proof). Replace with real, approved quotes and drop `placeholder`.
+  testimonials: [
+    { quote: 'Quote pending: ask the Picapool founders.', name: 'Name', role: 'Founder', company: 'Picapool', placeholder: true },
+    { quote: 'Quote pending: ask SLSPL Group.', name: 'Name', role: 'Director', company: 'SLSPL Group', placeholder: true },
+    { quote: 'Quote pending: ask YourProfessionals.', name: 'Name', role: 'Partner', company: 'YourProfessionals', placeholder: true },
+  ] as Testimonial[],
 };
 
 export const FAQ = [

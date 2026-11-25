@@ -43,10 +43,10 @@ const NODES = [
   { x: 88, y: 70, t: 'Slack', s: 'Alert team' },
 ];
 const EDGES = [[0, 1], [0, 2], [1, 3], [2, 3], [3, 4], [3, 5]];
-export function NodeGraph({ className = '' }: { className?: string }) {
+export function NodeGraph({ className = '', tag = true }: { className?: string; tag?: boolean }) {
   return (
     <div className={`mk mk-graph ${className}`}>
-      <p className="mk-tag">Sample workflow</p>
+      {tag && <p className="mk-tag">Sample workflow</p>}
       <svg viewBox="0 0 100 100" preserveAspectRatio="none" className="mk-edges">
         {EDGES.map(([a, b], i) => {
           const A = NODES[a], B = NODES[b];
@@ -127,12 +127,26 @@ export function Uptime({ className = '' }: { className?: string }) {
   );
 }
 
+export function Monitor({ className = '' }: { className?: string }) {
+  const rows = ['Website', 'Checkout', 'WhatsApp webhook', 'n8n workflows'];
+  return (
+    <div className={`mk mk-monitor ${className}`}>
+      <p className="mk-tag">Sample</p>
+      <p className="mk-dash-h">Uptime monitor</p>
+      {rows.map(r => <p key={r} className="mk-mon-row"><i />{r}<span>Up</span></p>)}
+      <svg viewBox="0 0 200 40" className="mk-spark" preserveAspectRatio="none">
+        <path d="M0 28 L20 26 L40 29 L60 22 L80 24 L100 18 L120 21 L140 16 L160 19 L180 14 L200 17" vectorEffect="non-scaling-stroke" />
+      </svg>
+      <p className="mk-mon-foot">Response time · last 24 h</p>
+    </div>
+  );
+}
+
 /** Code-drawn screens for case studies whose real screens are private. */
 export function MockScreen({ mock }: { mock: Mock }) {
-  if (mock === 'graph') return <NodeGraph className="is-screen" />;
+  if (mock === 'graph') return <NodeGraph className="is-screen" tag={false} />;
   if (mock === 'analyst') return (
     <div className="mk-screen-draw analyst">
-      <p className="mk-tag">Illustration</p>
       <p className="q">“How many new users came from campus drives last week?”</p>
       <pre>SELECT channel, count(*) … — validated ✓ read-only</pre>
       <div className="mk-bars small">{[40, 70, 55, 90, 35].map((h, i) => <i key={i} style={{ transform: `scaleY(${h / 100})` }} />)}</div>
@@ -140,7 +154,6 @@ export function MockScreen({ mock }: { mock: Mock }) {
   );
   if (mock === 'telegram') return (
     <div className="mk-screen-draw tg">
-      <p className="mk-tag">Illustration</p>
       <p className="bub out">Brief: why small teams should automate follow-ups</p>
       <p className="bub in">Researching 4 sources… ✓ 2 drafts ready</p>
       <p className="bub in card">Final post + cover image</p>
@@ -149,7 +162,6 @@ export function MockScreen({ mock }: { mock: Mock }) {
   );
   return (
     <div className="mk-screen-draw slspl">
-      <p className="mk-tag">Illustration</p>
       <p className="slspl-word">SLSPL</p>
       <p className="slspl-sub">Document attestation</p>
     </div>

@@ -24,3 +24,11 @@ ffmpeg -loglevel error -y -ss 2 -t 6 -i $P -vf "scale=360:640" -c:v libvpx-vp9 -
 ffmpeg -loglevel error -y -ss 2 -i $P -frames:v 1 -vf "scale=360:640" -q:v 3 $M/picapool-film-poster.jpg
 ffmpeg -loglevel error -y -i ~/portfolio/assets/portrait.webp -vf "scale=640:-1" -q:v 3 $M/deepanshu.jpg
 ls -la $M | awk '{print $5, $9}'
+# SLSPL: Sophos blocks the site on LPU Wi-Fi, so the source is a thum.io capture (.ref/rec/slspl-th-6.png, 1280x1280)
+src=.ref/rec/slspl-th-6.png
+vf="crop=1280:960:0:'320*(0.5-0.5*cos(2*PI*t/8))',scale=560:420,format=yuv420p"
+ffmpeg -loglevel error -y -loop 1 -framerate 24 -t 8 -i $src -vf "$vf" -c:v libx264 -preset slow -crf 30 -movflags +faststart -an $M/slspl.mp4
+ffmpeg -loglevel error -y -loop 1 -framerate 24 -t 8 -i $src -vf "$vf" -c:v libvpx-vp9 -b:v 0 -crf 44 -row-mt 1 -an $M/slspl.webm
+ffmpeg -loglevel error -y -i $src -vf "crop=1280:960:0:0,scale=560:420" -q:v 3 $M/slspl-poster.jpg
+ffmpeg -loglevel error -y -i $src -vf "crop=1280:800:0:0" -q:v 3 $M/slspl-hero.jpg
+ffmpeg -loglevel error -y -i $src -vf "crop=1280:800:0:480" -q:v 3 $M/slspl-2.jpg

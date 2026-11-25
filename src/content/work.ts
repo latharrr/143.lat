@@ -13,8 +13,10 @@ export type Work = {
   built: string[];
   stack: string[];
   results: { label: string; value: string }[];
+  oneLine: string; // result line under the carousel's centre item
   device: 'laptop' | 'phone';
   image?: string; // shown inside the device in the carousel
+  video?: string; // media name of a loop in /public/media (wins over image)
   mock?: Mock; // code-drawn diagram when no screenshot can be shown
   hero?: string;
   strip?: string[];
@@ -41,6 +43,7 @@ export const WORK: Work[] = [
       'Automated daily KPI digests and a WhatsApp Business API dashboard so follow-ups run from one place.',
     ],
     stack: ['n8n', 'PostgreSQL', 'Supabase', 'Next.js', 'WhatsApp Business Platform'],
+    oneLine: 'Leads enrich and score themselves on arrival.',
     results: [
       { label: 'Manual lookups per lead', value: 'Removed: enrichment runs on arrival' },
       { label: 'Hours saved per week', value: PENDING },
@@ -65,6 +68,7 @@ export const WORK: Work[] = [
       'An internal dashboard for the recurring numbers, plus a Telegram bot with retrieval over the analytics layer for quick questions on the go.',
     ],
     stack: ['Python', 'PostgreSQL', 'LLM SQL generation', 'RAG', 'Telegram Bot API'],
+    oneLine: 'Plain-English questions, validated read-only SQL.',
     results: [
       { label: 'Database access', value: 'Read-only, every query validated first' },
       { label: 'Where answers arrive', value: 'Dashboard and Telegram' },
@@ -89,6 +93,7 @@ export const WORK: Work[] = [
       'In-house event-fingerprinting attribution that follows a visitor from an on-ground QR code or a digital link to a submitted intent, so spend decisions are made on per-channel results instead of downloads.',
     ],
     stack: ['Next.js', 'Vercel', 'Google Apps Script', 'Google Sheets', 'Event fingerprinting'],
+    oneLine: 'Spend judged per channel, not by downloads.',
     results: [
       { label: 'What spend is judged on', value: 'Per-channel results, not downloads' },
       { label: 'Signups by channel', value: PENDING },
@@ -115,9 +120,14 @@ export const WORK: Work[] = [
       'A premium, fast website that walks visitors through each attestation type, the documents they need and how long it takes, with enquiry and WhatsApp routes on every page.',
     ],
     stack: [], // TODO: confirm SLSPL's stack and live URL; empty hides the block
+    oneLine: 'A premium, plain-steps site for a trust business.',
     results: [{ label: 'Delivered', value: 'Live website for the firm' }],
     device: 'laptop',
-    mock: 'slspl',
+    video: 'slspl',
+    image: '/media/slspl-hero.jpg',
+    hero: '/media/slspl-hero.jpg',
+    strip: ['/media/slspl-hero.jpg', '/media/slspl-2.jpg'],
+    link: { href: 'https://slsplgroup.com', label: 'slsplgroup.com' },
     services: ['websites', 'seo-performance'],
   },
   {
@@ -136,6 +146,7 @@ export const WORK: Work[] = [
       'Nothing is published until you tap approve and pick a time. A dispatcher then posts to LinkedIn and reports back with the link.',
     ],
     stack: ['Python', 'Telegram Bot API', 'Supabase', 'Groq', 'Tavily', 'FLUX', 'LinkedIn API'],
+    oneLine: 'Researched posts that only go out after approval.',
     results: [
       { label: 'Research sources per post', value: '4, checked in parallel' },
       { label: 'Drafts before the final post', value: '2' },
@@ -160,12 +171,14 @@ export const WORK: Work[] = [
       'Every statement gets one verdict, FAIL, REVIEW or CLEAR, with signed results, and it is available on the web, over the API, through webhooks and from a CLI, with INR billing.',
     ],
     stack: ['TypeScript', 'Next.js', 'PostgreSQL', 'Ed25519 signing', 'Razorpay'],
+    oneLine: 'Six fraud markers, one verdict, zero models.',
     results: [
       { label: 'Fraud markers checked', value: '6' },
       { label: 'Verdicts', value: 'FAIL · REVIEW · CLEAR' },
       { label: 'AI models in the decision path', value: '0' },
     ],
     device: 'laptop',
+    video: 'proofmart',
     image: '/media/proofmart-hero.jpg',
     hero: '/media/proofmart-hero.jpg',
     strip: ['/media/proofmart-hero.jpg', '/media/proofmart-2.jpg', '/media/proofmart-3.jpg'],
@@ -188,6 +201,7 @@ export const WORK: Work[] = [
       'Requests, chats, shareable trip links, women-only trips and an admin view for moderation.',
     ],
     stack: ['Next.js', 'Supabase', 'PostgreSQL', 'Sentry'],
+    oneLine: 'Verified-college matching with women-only trips.',
     results: [
       { label: 'Who can sign in', value: 'Verified college email only' },
       { label: 'Safety options', value: 'Women-only trips, request before chat' },
@@ -198,14 +212,46 @@ export const WORK: Work[] = [
     strip: ['/media/sangsafar-01-landing.jpg', '/media/sangsafar-04-discover.jpg', '/media/sangsafar-06-matches.jpg', '/media/sangsafar-10-chat-accepted.jpg'],
     services: ['apps'],
   },
+  {
+    slug: 'yourprofessionals',
+    title: 'YourProfessionals',
+    word: 'YourPros',
+    client: 'YourProfessionals',
+    type: 'Website · SEO · lead generation',
+    summary: 'SEO, a blog CMS and lead generation for a CA and CS firm in Delhi.',
+    oneLine: 'More organic visibility and inbound client leads.',
+    problem: [
+      'YourProfessionals, a chartered-accountancy and company-secretary practice in Laxmi Nagar, Delhi, competes for searches like company registration and GST filing against national aggregators with huge ad budgets. The site needed to be found, and the team needed a way to publish without a developer.',
+    ],
+    built: [
+      'An SEO pass across the service pages: structure, metadata, internal links and quote forms that route to WhatsApp.',
+      'A blog CMS on Supabase with email-free staff logins, so the team can publish compliance articles themselves.',
+      'Lead capture on every page: a quote form, click-to-WhatsApp and a callback request.',
+    ],
+    stack: ['Next.js', 'Supabase', 'Vercel', 'Technical SEO'],
+    results: [
+      { label: 'Organic visibility', value: 'Up, with inbound client leads' },
+      { label: 'Who publishes the blog', value: 'The firm’s own staff' },
+    ],
+    device: 'laptop',
+    video: 'yp',
+    image: '/media/yp-hero.jpg',
+    hero: '/media/yp-hero.jpg',
+    strip: ['/media/yp-hero.jpg', '/media/yp-2.jpg', '/media/yp-3.jpg'],
+    link: { href: 'https://yourprofessionals.in', label: 'yourprofessionals.in' },
+    services: ['seo-performance', 'websites'],
+  },
 ];
 
 export const getWork = (slug: string) => WORK.find(w => w.slug === slug);
 
+// Homepage carousel, in order.
+export const CAROUSEL = ['picapool-crm-automation', 'picapool-ai-data-analyst', 'slspl-group', 'linkedin-autopilot', 'proofmart', 'sangsafar', 'yourprofessionals'].map(s => getWork(s)!);
+
 // Hero orbit cards: real screen loops of live work.
 export const ORBIT_CARDS = [
   { name: 'ProofMart', media: 'proofmart', video: true },
-  { name: 'Gapl', media: 'gapl', video: true },
+  { name: 'SLSPL Group', media: 'slspl', video: true },
   { name: 'Picapool film', media: 'picapool-film', video: true, tall: true },
   { name: 'LpuTV', media: 'lputv', video: true },
   { name: 'Picapool intents', media: 'intent', video: true },
