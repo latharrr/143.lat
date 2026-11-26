@@ -1,6 +1,7 @@
 'use client';
 // 5. BIG SERVICE LIST — the word nearest the viewport centre darkens (scrubbed per word);
-// hover shows a lagging preview card (the service's real projects) that tilts with cursor velocity.
+// hover takes over: the hovered word is the bold one and shows a lagging preview card (the service's real projects)
+// that tilts with cursor velocity. Leaving a word clears both; leaving the list hands the bold back to scroll.
 import { useRef } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP, isReduced, isTouch, fadeIn } from '@/lib/motion';
@@ -45,9 +46,12 @@ export function ServiceList() {
     };
     // Hide, then drop the image, so a previous preview can never linger on a row without one.
     const clear = () => c.querySelectorAll<HTMLElement>('[data-shot]').forEach(el => (el.hidden = true));
-    const leave = () => { clearInterval(cycle); gsap.to(c, { scale: 0.6, opacity: 0, duration: 0.3, ease: 'power3.out', overwrite: true, onComplete: clear }); };
+    const leave = (e?: PointerEvent) => { (e?.currentTarget as HTMLElement | undefined)?.classList.remove('is-hot'); clearInterval(cycle); gsap.to(c, { scale: 0.6, opacity: 0, duration: 0.3, ease: 'power3.out', overwrite: true, onComplete: clear }); };
     const enter = (e: PointerEvent) => {
-      const list = SERVICE_PROJECTS[(e.currentTarget as HTMLElement).dataset.slug!] ?? [];
+      const w = e.currentTarget as HTMLElement;
+      words.forEach(o => o.classList.toggle('is-hot', o === w));
+      listEl.classList.add('is-hover');
+      const list = SERVICE_PROJECTS[w.dataset.slug!] ?? [];
       clearInterval(cycle);
       if (!list.length) return leave();
       let k = 0;
@@ -55,14 +59,15 @@ export function ServiceList() {
       if (list.length > 1) cycle = window.setInterval(() => show(list[(k = (k + 1) % list.length)]), 1400);
       gsap.to(c, { scale: 1, opacity: 1, duration: 0.4, ease: 'expo.out', overwrite: true });
     };
-    const list = root.current!.querySelector<HTMLElement>('.sl-list')!;
-    list.addEventListener('pointermove', move);
-    list.addEventListener('pointerleave', leave);
+    const listEl = root.current!.querySelector<HTMLElement>('.sl-list')!;
+    const out = () => { listEl.classList.remove('is-hover'); words.forEach(o => o.classList.remove('is-hot')); leave(); };
+    listEl.addEventListener('pointermove', move);
+    listEl.addEventListener('pointerleave', out);
     words.forEach(w => { w.addEventListener('pointerenter', enter); w.addEventListener('pointerleave', leave); });
     return () => {
       clearInterval(cycle);
-      list.removeEventListener('pointermove', move);
-      list.removeEventListener('pointerleave', leave);
+      listEl.removeEventListener('pointermove', move);
+      listEl.removeEventListener('pointerleave', out);
       words.forEach(w => { w.removeEventListener('pointerenter', enter); w.removeEventListener('pointerleave', leave); });
     };
   }, { scope: root });

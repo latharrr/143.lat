@@ -66,12 +66,16 @@ export function Hero() {
         const thing = arm.querySelector<HTMLElement>('.orb-card')!;
         const w = thing.offsetWidth / 2 + pad, h = thing.offsetHeight / 2 + pad;
         const c = arm.querySelector('.orb-pos')!.parentElement!.getBoundingClientRect(); // ring centre
+        // Phones: the ring centre sits below the text, so an upward-facing card is pulled in (toward the centre)
+        // instead of pushed out, which on short screens would drive it up through the headline.
+        const step = mobile && Math.sin(ang) < 0 ? -1 : 1;
         let r = base;
-        for (let i = 0; i < 60; i++) {
+        for (let i = 0; i < 60 && r >= 0; i++) {
           const x = c.left + Math.cos(ang) * r * vmax, y = c.top + Math.sin(ang) * r * vmax;
           if (!keep.some(k => x - w < k.right && x + w > k.left && y - h < k.bottom && y + h > k.top)) break;
-          r += 1;
+          r += step;
         }
+        r = Math.max(0, r);
         arm.style.setProperty(mobile ? '--rm' : '--r', `${r}vmax`);
       });
     };

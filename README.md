@@ -28,7 +28,7 @@ Every section runs inside `useGSAP`, so it is reverted on route change. With red
 | Services stack (Build, Automate, AI, Grow) | `components/home/ServicesShowcase.tsx` | next card slides over in `0.45`, outgoing card scales to `0.9` + shade `0.55`; screenshots per card in `MOCKS` (positions `.m1`–`.m4` in `globals.css`); parallax `45 × depth`, mouse tilt `10°/7°`. Phones: sticky stacking, scale `0.92` |
 | Curtain (light rises over the stage) | `ServicesShowcase.tsx` last segment + `.showcase + .paper { margin-top: -100vh }` | scale `0.95`, dim `0.4` |
 | Big service list | `components/home/ServiceList.tsx` | colour/weight peak at `0.25 → 1.25`; previews come from `SERVICE_PROJECTS` in `services.ts` (empty = no preview), cycle every `1.4 s` |
-| Work carousel | `components/home/WorkCarousel.tsx` | all of `PROJECTS`; `spacing` (vw), blur `3px`, lift `2vh`, pin length `220%`, fling `260`; friction in `useVelocityCarousel` |
+| Work carousel | `components/home/WorkCarousel.tsx` | all of `PROJECTS`; `spacing` (vw), blur `3px`, lift `2vh`, fling `260`; friction in `useVelocityCarousel`. Scroll length is `.wc-pin` height in `globals.css` (sticky, like the hero; a GSAP pin here caused layout shift) |
 | Inner page title | `components/ui/Reveal.tsx` `Title` | stagger `0.04`, rotation ±4° |
 | Expanding hero image | `components/inner/Inner.tsx` `ExpandHero` | `start`/`end`, inset `2%`, overlay `0.25` |
 | Line reveals | `Reveal.tsx` `Lines` | stagger `0.08`, start `top 80%` |

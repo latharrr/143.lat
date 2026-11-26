@@ -114,7 +114,8 @@ ul, ol { list-style: none; }
 .hero-eyebrow { display: inline-flex; gap: 0.4em; font-size: clamp(13px, 1.2vw, 16px); color: var(--soft-d); margin-bottom: 1.2vh; }
 .tick { display: inline-block; height: 1.6em; overflow: hidden; color: var(--on-dark); text-align: left; }
 .tick-list { display: flex; flex-direction: column; }
-.tick-list > span { display: block; height: 1.6em; line-height: 1.6em; }
+/* Mask shows 1.6em; slots are 2.6em apart, so the outgoing word has fully left before the next one enters. */
+.tick-list > span { display: block; height: 2.6em; line-height: 1.6em; }
 .hero-title { font-size: clamp(64px, 11vw, 200px); line-height: 0.9; font-weight: 700; letter-spacing: -0.045em; text-transform: uppercase; }
 .orbit { position: absolute; left: 50%; top: 80%; width: 0; height: 0; z-index: 3; }
 .orb-lift, .orb-arm, .orb-pos, .orb-spin { position: absolute; left: 0; top: 0; width: 0; height: 0; }
@@ -203,10 +204,19 @@ ul, ol { list-style: none; }
 .sc-mock.m1 { left: 2%; top: 6%; width: 60%; z-index: 1; }
 .sc-mock.m3 { right: 2%; bottom: 10%; width: 52%; z-index: 2; }
 .sc-mock.m2 { right: 4%; top: 2%; width: 19%; z-index: 3; }
-.sc-scene-build .m1 { left: 0; top: 2%; width: 41%; }
-.sc-scene-build .m4 { left: 0; top: auto; bottom: 9%; width: 41%; z-index: 1; }
-.sc-scene-build .m3 { left: 45%; right: auto; top: 18%; bottom: auto; width: 37%; }
-.sc-scene-build .m2 { left: auto; right: 0; top: 40%; width: 14%; }
+/* Build: Tulip's / Gapl stacked on the left, ProofMart centred in the second column, phone on the right. Sizes come
+   from the screen area itself (container units), so no screen covers another at any window size. A browser screen
+   is --bw wide and --bw*0.625 + 26px tall, plus 28px for its caption; the two left rows sit either side of the middle. */
+@media (min-width: 768px) {
+  .sc-scene-build .sc-mocks { container-type: size; --gap: 20px; --pw: min(13cqw, calc((100cqh - 60px) * 0.34));
+    --bw: min(calc((100cqw - var(--pw) - 2 * var(--gap)) / 2), calc(80cqh - 104px)); --bh: calc(var(--bw) * 0.625 + 26px); }
+  .sc-scene-build .sc-mock { width: var(--bw); right: auto; bottom: auto; }
+  .sc-scene-build .m1 { left: 0; top: calc(50cqh - var(--bh) - 36px); }
+  .sc-scene-build .m4 { left: 0; top: calc(50cqh + 8px); }
+  .sc-scene-build .m3 { left: calc(var(--bw) + var(--gap)); top: calc(50cqh - var(--bh) / 2 - 14px); }
+  /* phone height = screen (9:19.5) + 12px bezel; top is set directly because GSAP owns the transform */
+  .sc-scene-build .m2 { left: calc(2 * var(--bw) + 2 * var(--gap)); width: var(--pw); top: calc(50cqh - ((var(--pw) - 12px) * 2.1667 + 12px) / 2 - 14px); }
+}
 .sc-scene-grow .m1 { top: 20%; width: 66%; }
 .sc-scene-grow .m2 { right: 6%; top: 10%; width: 21%; }
 
@@ -287,6 +297,9 @@ ul, ol { list-style: none; }
 .sl-list { display: grid; justify-items: center; }
 .sl-item { display: inline-block; font-size: clamp(40px, 7.4vw, 124px); line-height: 1.04; letter-spacing: -0.045em; text-transform: uppercase; color: var(--grey-word); font-weight: 500; text-shadow: none; }
 @media (prefers-reduced-motion: reduce) { .sl-item { color: var(--ink); } }
+/* Hover overrides the scroll scrub's inline styles (hence !important): only the hovered word is bold. */
+.sl-list.is-hover .sl-item { color: var(--grey-word) !important; font-weight: 500 !important; transition: color 0.2s; }
+.sl-list.is-hover .sl-item.is-hot { color: var(--ink) !important; font-weight: 600 !important; }
 .sl-card { position: fixed; left: 0; top: 0; z-index: 30; width: 260px; aspect-ratio: 4 / 3; margin: -98px 0 0 24px; border-radius: var(--r12); overflow: hidden; pointer-events: none; opacity: 0; scale: 1; transform: scale(0.6); box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45); background: #222; }
 .sl-card > div { position: absolute; inset: 0; }
 .sl-card img { object-fit: cover; object-position: top; }
@@ -296,6 +309,12 @@ ul, ol { list-style: none; }
 
 /* ---------- 6. Work carousel ---------- */
 .work { position: relative; height: 100vh; height: 100svh; min-height: 640px; overflow: hidden; touch-action: pan-y; }
+/* Carousel "pin": sticky inside .wc-pin, whose extra height is the scroll distance (same approach as .hero-pin). */
+@media (prefers-reduced-motion: no-preference) {
+  .wc-pin { height: calc(max(100svh, 640px) + 220vh); }
+  .wc-pin > .work { position: sticky; top: 0; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 767px) { .wc-pin { height: calc(max(100svh, 640px) + 150vh); } }
 .wc-title { position: absolute; top: 6vh; left: 0; right: 0; text-align: center; font-family: var(--serif); font-weight: 400; font-size: clamp(28px, 3vw, 44px); color: var(--burgundy); z-index: 3; }
 .wc-blob { position: absolute; left: 50%; top: 52%; width: min(80vh, 92vw); aspect-ratio: 1; translate: -50% -50%; border-radius: 50%; z-index: 0;
   background: radial-gradient(circle at 30% 24%, #d95f3b 0%, #b3412c 22%, #6e1c24 52%, #3e0c14 78%, #2a070d 100%);
@@ -321,7 +340,9 @@ ul, ol { list-style: none; }
 .is-laptop .wc-screen { aspect-ratio: 16 / 10; border-radius: 6px; }
 .is-phone .wc-screen { aspect-ratio: 9 / 19.5; border-radius: 22px; }
 .wc-screen img { object-fit: cover; object-position: top; pointer-events: none; }
-.wc-info { position: absolute; left: 50%; bottom: 11vh; translate: -50% 0; z-index: 4; width: min(440px, calc(100% - 32px)); display: grid; justify-items: center; gap: 6px; padding: 16px 20px; border-radius: var(--r12); background: var(--paper); color: var(--ink); text-align: center; box-shadow: 0 20px 40px -20px rgba(60, 10, 20, 0.5); }
+.wc-info { position: absolute; left: 50%; bottom: 11vh; translate: -50% 0; z-index: 4; width: min(440px, calc(100% - 32px)); display: grid; padding: 16px 20px; border-radius: var(--r12); background: var(--paper); color: var(--ink); text-align: center; box-shadow: 0 20px 40px -20px rgba(60, 10, 20, 0.5); }
+.wi-panel { grid-area: 1 / 1; align-self: center; display: grid; justify-items: center; gap: 6px; visibility: hidden; }
+.wi-panel.is-on { visibility: visible; }
 .wi-name { font-weight: 600; font-size: 17px; letter-spacing: -0.01em; }
 .wi-result { font-size: 14px; color: var(--soft-l); }
 .wi-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; margin: 2px 0 4px; }
@@ -356,6 +377,9 @@ ul, ol { list-style: none; }
 .proof-big span { display: block; font-family: var(--serif); font-size: clamp(120px, 20vw, 300px); line-height: 0.9; color: var(--burgundy); transition: color 0.3s; }
 .proof-big em { display: block; font-style: normal; font-size: 15px; font-weight: 500; color: var(--orange); margin-top: 8px; }
 .proof-big:hover span { color: var(--orange); }
+.proof-big .count-up, .count-up { display: inline-grid; justify-items: start; font-variant-numeric: tabular-nums; }
+.proof-big .count-up > span, .count-up > span { grid-area: 1 / 1; display: inline; font: inherit; color: inherit; line-height: inherit; }
+.count-up .cu-size { visibility: hidden; }
 .logo-wall { margin-top: 64px; }
 .logo-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 32px; max-width: 1040px; margin: 0 auto; }
 .logo-row[aria-hidden] { display: none; }
@@ -519,6 +543,8 @@ ul, ol { list-style: none; }
   .orb-pos { transform: translateX(var(--rm)); }
   .orb-spin { transform: rotate(calc(-1 * var(--am) + var(--t, 0deg))); }
   .orb-desk { display: none; }
+  /* Phones: the knot sat behind the headline; park it in the empty lower-right corner (overrides the inline position). */
+  .hero-clay .clay-png[data-clay="knot"] { left: 90% !important; top: 97% !important; }
   .orb-card { width: 92px; }
   .orb-card.is-tall { width: 58px; }
   .orb-tag { font-size: 9px; padding: 3px 7px; right: -6px; top: -8px; }
@@ -562,4 +588,10 @@ ul, ol { list-style: none; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition-duration: 0.01ms !important; animation-duration: 0.01ms !important; scroll-behavior: auto !important; }
   .clay-canvas { display: none; }
+}
+
+/* Short phones (SE, small Androids): less room under the CTAs, so smaller hero cards. */
+@media (max-width: 767px) and (max-height: 760px) {
+  .orb-card { width: 70px; }
+  .orb-card.is-tall { width: 44px; }
 }
