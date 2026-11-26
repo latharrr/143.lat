@@ -56,7 +56,7 @@ export function Proof() {
               const ext = l.href.startsWith('http');
               const img = (
                 // eslint-disable-next-line @next/next/no-img-element
-                <img src={l.src} alt={l.name} loading="lazy" decoding="async" />
+                <img src={l.src} alt={l.name} width={l.w} height={l.h} loading="lazy" decoding="async" />
               );
               return (
                 <li key={l.name}>

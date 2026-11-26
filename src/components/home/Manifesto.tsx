@@ -14,7 +14,7 @@ export function Manifesto() {
       <p className="manifesto-text">
         <span data-fill>{MANIFESTO.before}</span>{' '}
         <span className="avatar-pill" aria-hidden>
-          <Image src="/media/deepanshu-cutout.webp" alt="" width={640} height={725} sizes="(max-width: 767px) 64px, 96px" />
+          <Image src="/media/deepanshu-cutout.webp" alt="" width={737} height={560} sizes="(max-width: 767px) 74px, 95px" />
         </span>
         <span data-fill>. {MANIFESTO.after}</span>{' '}
         <span className="is-key" data-fill>{MANIFESTO.key}</span>

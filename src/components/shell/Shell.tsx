@@ -124,7 +124,8 @@ function PageTransition() {
     const click = (e: MouseEvent) => {
       if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
       const a = (e.target as HTMLElement).closest('a');
-      if (!a || a.target || a.hasAttribute('download')) return;
+      // aria-expanded links are disclosure toggles (phone service-list rows): their own handler decides.
+      if (!a || a.target || a.hasAttribute('download') || a.hasAttribute('aria-expanded')) return;
       const url = new URL(a.href, location.href);
       if (url.origin !== location.origin) return;
       e.preventDefault();
