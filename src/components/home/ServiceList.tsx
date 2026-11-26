@@ -1,21 +1,15 @@
 'use client';
 // 5. BIG SERVICE LIST — the word nearest the viewport centre darkens (scrubbed per word);
-// hover shows a lagging preview card that tilts with cursor velocity.
+// hover shows a lagging preview card (the service's real projects) that tilts with cursor velocity.
 import { useRef } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP, isReduced, isTouch, fadeIn } from '@/lib/motion';
-import { LIST_ORDER, getService, serviceHref } from '@/content/services';
-import { LazyVideo } from '@/components/ui/LazyVideo';
+import Image from 'next/image';
+import { LIST_ORDER, SERVICE_PROJECTS, getService, serviceHref } from '@/content/services';
+import { getProject } from '@/content/work';
 
-// Preview footage per service: real projects, captioned with the project's name.
-const PREVIEW: Record<string, [string, string]> = {
-  shopify: ['yp', 'YourProfessionals'], 'ai-agents': ['proofmart', 'ProofMart'], 'n8n-automation': ['intent', 'Picapool intents'],
-  'whatsapp-email-automation': ['air', 'Picapool air'], '3d-websites': ['lputv', 'LpuTV'], websites: ['tbv', 'TrustBridgeVerify'],
-  'landing-pages': ['intent', 'Picapool intents'], apps: ['proofmart', 'ProofMart'], 'seo-performance': ['yp', 'YourProfessionals'],
-  scraping: ['slspl', 'SLSPL Group'], 'workflow-optimisation': ['air', 'Picapool air'], 'payments-booking': ['proofmart', 'ProofMart'],
-  maintenance: ['tbv', 'TrustBridgeVerify'],
-};
-const CLIPS = [...new Set(Object.values(PREVIEW).map(v => v[0]))];
+// Preview per service: the projects that demonstrate it (cycled while hovered). No project = no preview.
+const SHOTS = [...new Set(Object.values(SERVICE_PROJECTS).flat())].map(getProject);
 
 export function ServiceList() {
   const root = useRef<HTMLElement>(null);
@@ -44,23 +38,32 @@ export function ServiceList() {
       lastX = e.clientX; lastT = now;
       xTo(e.clientX); yTo(e.clientY); rTo(gsap.utils.clamp(-10, 10, v * 12));
     };
-    const enter = (e: PointerEvent) => {
-      const slug = (e.currentTarget as HTMLElement).dataset.slug!;
-      const [clip, name] = PREVIEW[slug];
-      c.querySelectorAll<HTMLElement>('[data-clip]').forEach(el => (el.hidden = el.dataset.clip !== clip));
-      c.querySelector('figcaption')!.textContent = name;
-      c.querySelector<HTMLVideoElement>(`[data-clip="${clip}"] video`)?.play().catch(() => {});
-      gsap.to(c, { scale: 1, opacity: 1, duration: 0.4, ease: 'expo.out' });
+    let cycle = 0;
+    const show = (slug: string) => {
+      c.querySelectorAll<HTMLElement>('[data-shot]').forEach(el => (el.hidden = el.dataset.shot !== slug));
+      c.querySelector('figcaption')!.textContent = getProject(slug).name;
     };
-    const leave = () => gsap.to(c, { scale: 0.6, opacity: 0, duration: 0.3, ease: 'power3.out' });
+    // Hide, then drop the image, so a previous preview can never linger on a row without one.
+    const clear = () => c.querySelectorAll<HTMLElement>('[data-shot]').forEach(el => (el.hidden = true));
+    const leave = () => { clearInterval(cycle); gsap.to(c, { scale: 0.6, opacity: 0, duration: 0.3, ease: 'power3.out', overwrite: true, onComplete: clear }); };
+    const enter = (e: PointerEvent) => {
+      const list = SERVICE_PROJECTS[(e.currentTarget as HTMLElement).dataset.slug!] ?? [];
+      clearInterval(cycle);
+      if (!list.length) return leave();
+      let k = 0;
+      show(list[0]);
+      if (list.length > 1) cycle = window.setInterval(() => show(list[(k = (k + 1) % list.length)]), 1400);
+      gsap.to(c, { scale: 1, opacity: 1, duration: 0.4, ease: 'expo.out', overwrite: true });
+    };
     const list = root.current!.querySelector<HTMLElement>('.sl-list')!;
     list.addEventListener('pointermove', move);
     list.addEventListener('pointerleave', leave);
-    words.forEach(w => w.addEventListener('pointerenter', enter));
+    words.forEach(w => { w.addEventListener('pointerenter', enter); w.addEventListener('pointerleave', leave); });
     return () => {
+      clearInterval(cycle);
       list.removeEventListener('pointermove', move);
       list.removeEventListener('pointerleave', leave);
-      words.forEach(w => w.removeEventListener('pointerenter', enter));
+      words.forEach(w => { w.removeEventListener('pointerenter', enter); w.removeEventListener('pointerleave', leave); });
     };
   }, { scope: root });
 
@@ -80,7 +83,11 @@ export function ServiceList() {
         })}
       </ul>
       <div ref={card} className="sl-card" aria-hidden>
-        {CLIPS.map(c => <div key={c} data-clip={c} hidden><LazyVideo name={c} /></div>)}
+        {SHOTS.map(p => (
+          <div key={p.slug} data-shot={p.slug} className={p.device === 'phone' ? 'is-phone' : undefined} hidden>
+            <Image src={p.device === 'phone' ? p.mobile! : p.desktop} alt="" fill sizes="260px" />
+          </div>
+        ))}
         <figcaption />
       </div>
     </section>

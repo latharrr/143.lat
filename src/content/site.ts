@@ -46,36 +46,28 @@ export const PROCESS = [
   { title: 'Support', body: 'Two weeks of free fixes after launch, then an optional monthly retainer.' },
 ];
 
-// DRAFT prices: replace with your own numbers before launch.
 export const PRICING = [
   { name: 'Landing page', from: 15000, unit: '', note: 'One page, copy help, analytics, live in about a week.' },
-  { name: 'Business website', from: 35000, unit: '', note: 'Up to 8 pages, CMS or blog, SEO set-up, contact and WhatsApp.' },
-  { name: 'Shopify store', from: 30000, unit: '', note: 'Theme set-up, catalogue, payments, shipping and launch checklist.' },
-  { name: 'Automation setup', from: 20000, unit: '', note: 'One n8n, WhatsApp or email workflow, end to end, documented.' },
-  { name: 'AI agent', from: 40000, unit: '', note: 'One agent with tools, guardrails, human approval and logs.' },
-  { name: 'Monthly retainer', from: 8000, unit: '/month', note: 'Updates, monitoring, small features and a same-week response.' },
+  { name: 'Business website', from: 50000, unit: '', note: 'Up to 8 pages, CMS or blog, SEO set-up, contact and WhatsApp.' },
+  { name: 'Shopify store', from: 45000, unit: '', note: 'Theme set-up, catalogue, payments, shipping and launch checklist.' },
+  { name: 'Automation setup', from: 30000, unit: '', note: 'One n8n, WhatsApp or email workflow, end to end, documented.' },
+  { name: 'AI agent', from: 40000, unit: ' one-time', note: 'One agent with tools, guardrails, human approval and logs.', alt: 'or a monthly plan, quoted on call' },
+  { name: 'Monthly retainer', from: 10000, unit: '/month', note: 'Updates, monitoring, small features and a same-week response.' },
 ];
 
-export type Testimonial = { quote: string; name: string; role: string; company: string; photo?: string; placeholder?: boolean };
-export type Logo = { name: string; src?: string; w: number; h: number };
+export type Logo = { name: string; src: string; href: string };
 
 export const PROOF = {
-  shipped: 29,
-  // Real logo files from each client's own site or repo. No file yet = text wordmark.
+  shipped: 50, // shown as "50+"
+  // SVG marks only. `href` is the case study or the live site.
   logos: [
-    { name: 'Picapool', src: '/logos/picapool.png', w: 551, h: 120 },
-    { name: 'YourProfessionals', src: '/logos/yourprofessionals.svg', w: 662, h: 377 },
-    { name: 'TrustBridgeVerify', src: '/logos/trustbridgeverify.svg', w: 1000, h: 200 },
-    { name: 'Spraykart', src: '/logos/spraykart.png', w: 480, h: 80 },
-    { name: 'SLSPL Group', w: 0, h: 0 },
-    { name: 'UniLyf', w: 0, h: 0 },
+    { name: 'Picapool', src: '/logos/picapool.svg', href: '/work/picapool-acquisition-campaign' },
+    { name: 'YourProfessionals', src: '/logos/yourprofessionals.svg', href: '/work/yourprofessionals' },
+    { name: 'Spraykart', src: '/logos/spraykart.svg', href: 'https://www.spraykart.com' },
+    { name: 'Tulip’s Oven', src: '/logos/tulips-oven.svg', href: 'https://tulipsoven.com' },
+    { name: 'Gapl', src: '/logos/gapl.svg', href: 'https://gapl.vercel.app' },
+    { name: 'ProofMart', src: '/logos/proofmart.svg', href: '/work/proofmart' },
   ] as Logo[],
-  // Placeholders render in dev only (see Proof). Replace with real, approved quotes and drop `placeholder`.
-  testimonials: [
-    { quote: 'Quote pending: ask the Picapool founders.', name: 'Name', role: 'Founder', company: 'Picapool', placeholder: true },
-    { quote: 'Quote pending: ask SLSPL Group.', name: 'Name', role: 'Director', company: 'SLSPL Group', placeholder: true },
-    { quote: 'Quote pending: ask YourProfessionals.', name: 'Name', role: 'Partner', company: 'YourProfessionals', placeholder: true },
-  ] as Testimonial[],
 };
 
 export const FAQ = [

@@ -138,9 +138,11 @@ export function usePinScenes(
   ref: RefObject<HTMLElement | null>,
   scenes: number,
   build: (tl: gsap.core.Timeline, mobile: boolean) => void,
-  opts: { vhPerScene?: number; scrub?: number | boolean; onUpdate?: (p: number) => void; when?: string } = {},
+  // sticky: the element is CSS-sticky inside a parent that already holds the scroll distance; no GSAP pin, so the DOM
+  // is never re-parented (no layout shift, no late LCP candidates). The parent's height must match the pin length.
+  opts: { vhPerScene?: number; scrub?: number | boolean; onUpdate?: (p: number) => void; when?: string; sticky?: boolean } = {},
 ) {
-  const { vhPerScene = 100, scrub = 1, onUpdate, when = '(prefers-reduced-motion: no-preference)' } = opts;
+  const { vhPerScene = 100, scrub = 1, onUpdate, when = '(prefers-reduced-motion: no-preference)', sticky = false } = opts;
   useGSAP(() => {
     const mm = gsap.matchMedia(ref.current ?? undefined);
     mm.add(when, () => {
@@ -149,8 +151,10 @@ export function usePinScenes(
       const tl = gsap.timeline({
         defaults: { ease: EASE.scrub },
         scrollTrigger: {
-          trigger: ref.current, start: 'top top', end: `+=${vh}%`, pin: true, scrub, anticipatePin: 1,
-          onUpdate: onUpdate ? s => onUpdate(s.progress) : undefined,
+          ...(sticky
+            ? { trigger: ref.current!.parentElement, start: 'top top', end: 'bottom bottom' }
+            : { trigger: ref.current, start: 'top top', end: `+=${vh}%`, pin: true, anticipatePin: 1 }),
+          scrub, onUpdate: onUpdate ? s => onUpdate(s.progress) : undefined,
         },
       });
       build(tl, mobile);

@@ -2,6 +2,7 @@
 import Link from 'next/link';
 import { Reveal, Lines } from '@/components/ui/Reveal';
 import { CONTACT, FAQ, PRICING, PROCESS, PROOF, inr } from '@/content/site';
+import { CountUp } from '@/components/ui/CountUp';
 
 export function Process() {
   return (
@@ -32,6 +33,7 @@ export function Pricing() {
           <article key={p.name} className="price rv">
             <h3>{p.name}</h3>
             <p className="price-n"><small>from</small> {inr(p.from)}<small>{p.unit}</small></p>
+            {'alt' in p && <p className="price-alt">{p.alt}</p>}
             <p>{p.note}</p>
           </article>
         ))}
@@ -42,38 +44,31 @@ export function Pricing() {
 }
 
 export function Proof() {
-  // Placeholder testimonials show in dev only, so a pending quote can never ship.
-  const quotes = PROOF.testimonials.filter(t => !t.placeholder || process.env.NODE_ENV !== 'production');
   return (
     <Reveal as="section" className="block proof" aria-labelledby="pf-title">
       <p className="eyebrow rv" id="pf-title">Proof</p>
-      <Link href="/work" className="proof-big rv" data-title="Work"><span>{PROOF.shipped}</span> products shipped <em>See the work →</em></Link>
-      <ul className="logo-row" aria-label="Teams I have built for">
-        {PROOF.logos.map(l => (
-          <li key={l.name} className="rv">
-            {l.src
-              // eslint-disable-next-line @next/next/no-img-element
-              ? <img src={l.src} alt={l.name} width={l.w} height={l.h} loading="lazy" decoding="async" />
-              : <span className="logo-word">{l.name}</span>}
-          </li>
+      <Link href="/work" className="proof-big rv" data-title="Work"><span><CountUp to={PROOF.shipped} suffix="+" /></span> products shipped <em>See the work →</em></Link>
+      {/* Static grid on desktop; on phones the row becomes an infinite marquee (second copy is aria-hidden). */}
+      <div className="logo-wall rv">
+        {[0, 1].map(copy => (
+          <ul key={copy} className="logo-row" aria-label={copy ? undefined : 'Teams and products I have built for'} aria-hidden={copy ? true : undefined}>
+            {PROOF.logos.map(l => {
+              const ext = l.href.startsWith('http');
+              const img = (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={l.src} alt={l.name} loading="lazy" decoding="async" />
+              );
+              return (
+                <li key={l.name}>
+                  {ext
+                    ? <a href={l.href} target="_blank" rel="noopener" data-name={l.name} tabIndex={copy ? -1 : undefined}>{img}</a>
+                    : <Link href={l.href} data-name={l.name} data-title={l.name} tabIndex={copy ? -1 : undefined}>{img}</Link>}
+                </li>
+              );
+            })}
+          </ul>
         ))}
-      </ul>
-      {quotes.length > 0 && (
-        <div className="quotes">
-          {quotes.map((t, i) => (
-            <figure key={i} className={`quote rv ${t.placeholder ? 'is-placeholder' : ''}`}>
-              <blockquote>“{t.quote}”</blockquote>
-              <figcaption>
-                {t.photo
-                  // eslint-disable-next-line @next/next/no-img-element
-                  ? <img src={t.photo} alt="" width={48} height={48} />
-                  : <span className="quote-photo" aria-hidden>{t.company[0]}</span>}
-                <span><b>{t.name}</b>{t.role}, {t.company}</span>
-              </figcaption>
-            </figure>
-          ))}
-        </div>
-      )}
+      </div>
     </Reveal>
   );
 }

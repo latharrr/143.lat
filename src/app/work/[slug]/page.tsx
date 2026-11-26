@@ -2,12 +2,11 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
-import { WORK, getWork } from '@/content/work';
+import { WORK, getWork, getProject } from '@/content/work';
 import { getService, serviceHref } from '@/content/services';
 import { SITE } from '@/content/site';
 import { Title, Lines, Reveal } from '@/components/ui/Reveal';
 import { ExpandHero, Diamond, PillSwitcher, ImageStrip } from '@/components/inner/Inner';
-import { MockScreen } from '@/components/home/Mockups';
 
 type P = { params: Promise<{ slug: string }> };
 export const generateStaticParams = () => WORK.map(w => ({ slug: w.slug }));
@@ -16,13 +15,14 @@ export async function generateMetadata({ params }: P): Promise<Metadata> {
   const w = getWork((await params).slug);
   if (!w) return {};
   const title = `${w.title} case study`;
-  return { title, description: `${w.summary} Problem, what I built, stack and results.`, alternates: { canonical: `/work/${w.slug}` }, openGraph: { title, url: `/work/${w.slug}`, images: w.hero ? [w.hero] : undefined } };
+  return { title, description: `${w.summary} Problem, what I built, stack and results.`, alternates: { canonical: `/work/${w.slug}` }, openGraph: { title, url: `/work/${w.slug}`, images: [getProject(w.slug).desktop] } };
 }
 
 export default async function CaseStudy({ params }: P) {
   const w = getWork((await params).slug);
   if (!w) notFound();
   const next = WORK[(WORK.indexOf(w) + 1) % WORK.length];
+  const pr = getProject(w.slug);
   const ld = {
     '@context': 'https://schema.org', '@type': 'CreativeWork', name: w.title, about: w.summary,
     creator: { '@id': `${SITE.url}/#person` }, url: `${SITE.url}/work/${w.slug}`, keywords: w.stack.join(', '),
@@ -36,12 +36,14 @@ export default async function CaseStudy({ params }: P) {
         <dl className="case-meta">
           <div><dt>Client</dt><dd>{w.client}</dd></div>
           <div><dt>Type</dt><dd>{w.type}</dd></div>
-          {w.link && <div><dt>Live</dt><dd><a className="u" href={w.link.href} target="_blank" rel="noopener">{w.link.label}</a></dd></div>}
+          {w.link && <div><dt>{pr.live ? 'Live' : 'Code'}</dt><dd><a className="u" href={w.link.href} target="_blank" rel="noopener">{w.link.label}</a></dd></div>}
+          {pr.note && <div><dt>Status</dt><dd>{pr.note}</dd></div>}
+          {pr.recreated && <div><dt>Screens</dt><dd><span className="tag-recreated">Recreated UI</span> anonymised values</dd></div>}
         </dl>
       </header>
 
       <ExpandHero>
-        {w.hero ? <Image src={w.hero} alt="" fill priority sizes="100vw" /> : <div className="xh-draw"><MockScreen mock={w.mock!} /></div>}
+        <Image src={pr.desktop} alt={`${w.title}${pr.recreated ? ' (recreated UI)' : ''}`} fill priority sizes="100vw" />
       </ExpandHero>
 
       <article className="prose">
