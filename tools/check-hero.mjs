@@ -14,7 +14,7 @@ const r = await p.evaluate(() => {
   const chars = [...h1.querySelectorAll('div div, div > span')].filter(e => e.textContent.trim().length === 1);
   const glyphs = (chars.length ? chars.map(box) : [...range.getClientRects()].map(x => ({ l: x.left, t: x.top, r: x.right, b: x.bottom })));
   const hit = (a, c) => a.l < c.r && a.r > c.l && a.t < c.b && a.b > c.t;
-  const things = [...document.querySelectorAll('.orb-card, .orb-pill')].filter(e => getComputedStyle(e.closest('.orb-lift')).display !== 'none').map(e => ({ name: e.textContent.trim().slice(0, 18) || 'card', ...box(e) }));
+  const things = [...document.querySelectorAll('.orb-card')].filter(e => getComputedStyle(e.closest('.orb-lift')).display !== 'none').map(e => ({ name: e.textContent.trim().slice(0, 18) || 'card', ...box(e) }));
   const lead = document.querySelector('.hero-lead'); const lr = document.createRange(); lr.selectNodeContents(lead);
   const centreBoxes = [...lr.getClientRects()].map(x => ({ l: x.left, t: x.top, r: x.right, b: x.bottom })).concat([...document.querySelectorAll('.hero-centre .btn')].map(box));
   const centre = box(document.querySelector('.hero-centre'));

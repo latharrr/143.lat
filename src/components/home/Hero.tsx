@@ -4,34 +4,27 @@ import { useRef } from 'react';
 import Image from 'next/image';
 import { gsap, useGSAP, useSplitReveal, usePinScenes, isReduced, isMobile, px, EASE } from '@/lib/motion';
 import { AUDIENCES, CONTACT } from '@/content/site';
-import { ORBIT_CARDS } from '@/content/work';
-import { LazyVideo } from '@/components/ui/LazyVideo';
+import { PROJECTS } from '@/content/work';
 import { Magnetic } from '@/components/ui/Magnetic';
 import { Clay, ClayItem } from '@/components/clay/Clay';
 
 const RINGS = [18, 30, 42, 54, 66];
 // Polar slots around the ring centre (50%, 80%): r in vmax, a in degrees (-90 = straight up).
-// Desktop and phone sets were solved from target positions so nothing covers the headline or CTAs at rest.
+// Desktop and phone sets were solved from target positions so nothing covers the headline or CTAs at rest
+// (desktop: card centres picked at 1440x900, one per project in PROJECTS order).
 type Slot = { r: number; a: number; rm: number; am: number; speed: number; tilt: number; dir: 1 | -1 };
 const SLOTS: Slot[] = [
-  { r: 48.5, a: -156.4, rm: 31.2, am: -120.9, speed: 1.1, tilt: -6, dir: 1 },
-  { r: 48.5, a: -23.6, rm: 31.2, am: -59.1, speed: 0.8, tilt: 5, dir: -1 },
-  { r: 34.5, a: -170.7, rm: 24.4, am: -90, speed: 1.5, tilt: -4, dir: 1 },
-  { r: 34.5, a: -9.3, rm: 16.5, am: -142, speed: 0.6, tilt: 7, dir: 1 },
-  { r: 21.8, a: 163.3, rm: 16.5, am: -38, speed: 1.3, tilt: -7, dir: -1 },
-  { r: 21.8, a: 16.7, rm: 4, am: 90, speed: 0.9, tilt: 4, dir: 1 },
-  { r: 43.2, a: 168.9, rm: 0, am: 0, speed: 1.6, tilt: 6, dir: -1 },
-  { r: 43.2, a: 11.1, rm: 0, am: 0, speed: 1.2, tilt: -3, dir: -1 },
-  { r: 9, a: 90, rm: 0, am: 0, speed: 0.7, tilt: 3, dir: 1 },
-  { r: 47.5, a: -6.7, rm: 0, am: 0, speed: 1.4, tilt: -5, dir: -1 },
-];
-const PILLS = [
-  { label: 'Shopify', r: 30.4, a: -152.9, rm: 33, am: -103.5, speed: 1.2 },
-  { label: 'n8n', r: 31.5, a: -22, rm: 19.7, am: -55.1, speed: 0.9 },
-  { label: 'AI Agent', r: 11.5, a: 166, rm: 17.2, am: 178.4, speed: 1.4 },
-  { label: 'WhatsApp', r: 11.5, a: 14, rm: 17.2, am: 1.6, speed: 0.7 },
-  { label: '3D', r: 41.8, a: -158.6, rm: 33.2, am: -75.5, speed: 1.0 },
-  { label: 'SEO', r: 41.8, a: -21.4, rm: 14.9, am: -90, speed: 1.3 },
+  { r: 36.1, a: -160.3, rm: 31.2, am: -120.9, speed: 1.1, tilt: -6, dir: 1 },
+  { r: 36.1, a: -19.7, rm: 31.2, am: -59.1, speed: 0.8, tilt: 5, dir: -1 },
+  { r: 42.4, a: 179.5, rm: 24.4, am: -90, speed: 1.5, tilt: -4, dir: 1 },
+  { r: 42.4, a: 0.5, rm: 16.5, am: -142, speed: 0.6, tilt: 7, dir: 1 },
+  { r: 21.5, a: 166.0, rm: 16.5, am: -38, speed: 1.3, tilt: -7, dir: -1 },
+  { r: 21.6, a: 14.9, rm: 4, am: 90, speed: 0.9, tilt: 4, dir: 1 },
+  { r: 33.9, a: 159.6, rm: 0, am: 0, speed: 1.6, tilt: 6, dir: -1 },
+  { r: 36.9, a: 22.7, rm: 0, am: 0, speed: 1.2, tilt: -3, dir: -1 },
+  { r: 10.1, a: 90.0, rm: 0, am: 0, speed: 0.7, tilt: 3, dir: 1 },
+  { r: 52.8, a: -30.9, rm: 0, am: 0, speed: 1.4, tilt: -5, dir: -1 },
+  { r: 52.8, a: -149.1, rm: 0, am: 0, speed: 1.0, tilt: 5, dir: 1 },
 ];
 const vars = (r: number, a: number, rm: number, am: number, tilt = 0) => ({
   style: { '--r': `${r}vmax`, '--a': `${a}deg`, '--rm': `${rm}vmax`, '--am': `${am}deg`, '--t': `${tilt}deg` } as React.CSSProperties,
@@ -48,7 +41,7 @@ export function Hero() {
   const h1 = useRef<HTMLHeadingElement>(null);
   const progress = useRef(0);
 
-  // Rest layout: slots are starting points; push each card/pill outward along its ring until it clears
+  // Rest layout: slots are starting points; push each card outward along its ring until it clears
   // the headline glyph lines and the lead + CTAs. Runs before SplitText so text boxes are untransformed.
   useGSAP(() => {
     const hero = root.current!;
@@ -70,7 +63,7 @@ export function Hero() {
         if (getComputedStyle(lift).display === 'none') return;
         const base = parseFloat(arm.dataset[mobile ? 'rm' : 'r']!);
         const ang = (parseFloat(arm.dataset[mobile ? 'am' : 'a']!) * Math.PI) / 180;
-        const thing = arm.querySelector<HTMLElement>('.orb-card, .orb-pill')!;
+        const thing = arm.querySelector<HTMLElement>('.orb-card')!;
         const w = thing.offsetWidth / 2 + pad, h = thing.offsetHeight / 2 + pad;
         const c = arm.querySelector('.orb-pos')!.parentElement!.getBoundingClientRect(); // ring centre
         let r = base;
@@ -83,6 +76,7 @@ export function Hero() {
       });
     };
     solve();
+    document.fonts?.ready.then(solve); // re-measure once Poppins has replaced the fallback font
     let t = 0;
     const onResize = () => { clearTimeout(t); t = window.setTimeout(solve, 150); };
     addEventListener('resize', onResize);
@@ -93,7 +87,7 @@ export function Hero() {
   useSplitReveal(h1, { type: 'chars', stagger: 0.03, duration: 1.1, onScroll: false, delay: 0.1 });
   useGSAP(() => {
     if (isReduced()) return;
-    gsap.fromTo('.orb-card, .orb-pill', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, stagger: 0.05, duration: 0.8, ease: 'back.out(1.6)', delay: 0.7 });
+    gsap.fromTo('.orb-card', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, stagger: 0.05, duration: 0.8, ease: 'back.out(1.6)', delay: 0.7 });
     gsap.fromTo('.hero-eyebrow, .hero-rings', { opacity: 0 }, { opacity: 1, duration: 1.2, ease: EASE.reveal, delay: 0.4 });
     gsap.fromTo('.hero-centre > *', { autoAlpha: 0, y: 24 }, { autoAlpha: 1, y: 0, duration: 1, stagger: 0.1, ease: EASE.reveal, delay: 0.5 });
     // Audience ticker: vertical slot roll, 2.2s per word, seamless loop via a duplicated first word.
@@ -119,9 +113,10 @@ export function Hero() {
       tl.to(card, { rotation: `+=${-20 * dir + 8 * dir}`, duration: 1 }, 0);
     });
     CLAY.forEach(c => tl.to(`.clay-png[data-clay="${c.kind}"]`, { y: () => -(c.drift ?? 0) / 100 * innerHeight * k, duration: 1 }, 0));
-  }, { vhPerScene: 100, onUpdate: p => (progress.current = p) });
+  }, { vhPerScene: 100, onUpdate: p => (progress.current = p), sticky: true }); // .hero-pin (CSS) holds the 200vh / 150vh
 
   return (
+    <div className="hero-pin">
     <section ref={root} className="hero dark" aria-labelledby="hero-title">
       <svg className="hero-rings" viewBox="-100 -100 200 200" aria-hidden>
         {RINGS.map(r => <circle key={r} r={r} />)}
@@ -152,17 +147,19 @@ export function Hero() {
       </div>
 
       <div className="orbit" aria-hidden>
-        {ORBIT_CARDS.map((c, i) => {
+        {PROJECTS.map((c, i) => {
           const s = SLOTS[i];
+          const tall = c.device === 'phone' && !!c.mobile;
           return (
-            <div key={c.name} className={`orb-lift ${i > 5 ? 'orb-desk' : ''}`} data-speed={s.speed}>
+            <div key={c.slug} className={`orb-lift ${i > 5 ? 'orb-desk' : ''}`} data-speed={s.speed}>
               <div className="orb-arm" data-dir={s.dir} {...vars(s.r, s.a, s.rm, s.am, s.tilt)}>
                 <div className="orb-pos">
                   <div className="orb-spin">
-                    <figure className={`orb-card ${c.tall ? 'is-tall' : ''}`} data-cursor="View">
-                      {c.video ? <LazyVideo name={c.media} /> : (
-                        <Image src={`/media/${c.media}.jpg`} alt="" fill sizes="220px" />
-                      )}
+                    <figure className={`orb-card ${tall ? 'is-tall' : ''}`} data-cursor="View">
+                      <span className="orb-shot">
+                        <Image src={tall ? c.mobile! : c.desktop} alt="" fill sizes={tall ? '120px' : '(max-width: 767px) 92px, 210px'} />
+                      </span>
+                      <span className="orb-tag">{c.tag}</span>
                       <figcaption>{c.name}</figcaption>
                     </figure>
                   </div>
@@ -171,20 +168,10 @@ export function Hero() {
             </div>
           );
         })}
-        {PILLS.map(p => (
-          <div key={p.label} className="orb-lift" data-speed={p.speed}>
-            <div className="orb-arm" {...vars(p.r, p.a, p.rm, p.am)}>
-              <div className="orb-pos">
-                <div className="orb-spin">
-                  <span className="orb-pill">{p.label}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
       </div>
 
-      <Clay items={CLAY} progress={progress} className="hero-clay" />
+      <Clay items={CLAY} progress={progress} className="hero-clay" eager />
     </section>
+    </div>
   );
 }

@@ -1,7 +1,6 @@
 // Case studies. Format: Problem -> What I built -> Stack -> Result. Real numbers only.
 // Picapool numbers stay out until Picapool approves them (README "Before launch").
 
-export type Mock = 'graph' | 'analyst' | 'telegram' | 'slspl';
 export type Work = {
   slug: string;
   title: string;
@@ -14,12 +13,7 @@ export type Work = {
   stack: string[];
   results: { label: string; value: string }[];
   oneLine: string; // result line under the carousel's centre item
-  device: 'laptop' | 'phone';
-  image?: string; // shown inside the device in the carousel
-  video?: string; // media name of a loop in /public/media (wins over image)
-  mock?: Mock; // code-drawn diagram when no screenshot can be shown
-  hero?: string;
-  strip?: string[];
+  strip?: string[]; // extra screens on the case page
   link?: { href: string; label: string };
   services: string[]; // related service slugs
 };
@@ -49,8 +43,6 @@ export const WORK: Work[] = [
       { label: 'Hours saved per week', value: PENDING },
       { label: 'Leads processed per week', value: PENDING },
     ],
-    device: 'laptop',
-    mock: 'graph',
     services: ['n8n-automation', 'whatsapp-email-automation'],
   },
   {
@@ -74,8 +66,6 @@ export const WORK: Work[] = [
       { label: 'Where answers arrive', value: 'Dashboard and Telegram' },
       { label: 'Time to an answer', value: PENDING },
     ],
-    device: 'laptop',
-    mock: 'analyst',
     services: ['ai-agents', 'apps'],
   },
   {
@@ -99,36 +89,8 @@ export const WORK: Work[] = [
       { label: 'Signups by channel', value: PENDING },
       { label: 'Cost per signup', value: PENDING },
     ],
-    device: 'phone',
-    image: '/media/intent-hero.jpg',
-    hero: '/media/intent-hero.jpg',
-    strip: ['/media/intent-hero.jpg', '/media/intent-2.jpg', '/media/air-hero.jpg', '/media/air-2.jpg'],
     link: { href: 'https://plan.picapool.tech', label: 'plan.picapool.tech' },
-    services: ['landing-pages', 'seo-performance'],
-  },
-  {
-    slug: 'slspl-group',
-    title: 'SLSPL Group website',
-    word: 'SLSPL',
-    client: 'SLSPL Group',
-    type: 'Website · professional services',
-    summary: 'A high-end website for a document attestation firm.',
-    problem: [
-      'Document attestation is a trust business. People hand over degrees, birth certificates and company papers, often for a visa or a job abroad. SLSPL Group needed a website that looked as careful as the work it does and explained a confusing process in plain steps.',
-    ],
-    built: [
-      'A premium, fast website that walks visitors through each attestation type, the documents they need and how long it takes, with enquiry and WhatsApp routes on every page.',
-    ],
-    stack: [], // TODO: confirm SLSPL's stack and live URL; empty hides the block
-    oneLine: 'A premium, plain-steps site for a trust business.',
-    results: [{ label: 'Delivered', value: 'Live website for the firm' }],
-    device: 'laptop',
-    video: 'slspl',
-    image: '/media/slspl-hero.jpg',
-    hero: '/media/slspl-hero.jpg',
-    strip: ['/media/slspl-hero.jpg', '/media/slspl-2.jpg'],
-    link: { href: 'https://slsplgroup.com', label: 'slsplgroup.com' },
-    services: ['websites', 'seo-performance'],
+    services: ['landing-pages'],
   },
   {
     slug: 'linkedin-autopilot',
@@ -141,20 +103,20 @@ export const WORK: Work[] = [
       'Posting on LinkedIn every week takes hours: research, writing, rewriting so it does not sound like AI, making an image and remembering to post. Most AI writers skip the research and invent numbers.',
     ],
     built: [
-      'A Telegram bot. You send a brief or a link; it researches the topic across four sources at once and keeps only facts whose numbers appear on the page they cite.',
-      'It writes two candidate drafts in your voice from a profile card and story bank, merges them, runs de-AI, number, truth and length checks, and makes a designed cover image.',
-      'Nothing is published until you tap approve and pick a time. A dispatcher then posts to LinkedIn and reports back with the link.',
+      'A Telegram bot. You sent a brief or a link; it researched the topic across four sources at once and kept only facts whose numbers appeared on the page they cited.',
+      'It wrote two candidate drafts in your voice from a profile card and story bank, merged them, ran de-AI, number, truth and length checks, and made a designed cover image.',
+      'Nothing was published until you tapped approve and picked a time. A dispatcher then posted to LinkedIn and reported back with the link. The bot was stopped on 13 November 2026.',
     ],
     stack: ['Python', 'Telegram Bot API', 'Supabase', 'Groq', 'Tavily', 'FLUX', 'LinkedIn API'],
-    oneLine: 'Researched posts that only go out after approval.',
+    oneLine: 'Researched drafts that only went out after approval. Stopped on 13 Nov 2026.',
     results: [
+      { label: 'Status', value: 'Stopped on 13 November 2026' },
       { label: 'Research sources per post', value: '4, checked in parallel' },
       { label: 'Drafts before the final post', value: '2' },
       { label: 'Posts without approval', value: '0' },
     ],
-    device: 'phone',
-    mock: 'telegram',
-    services: ['ai-agents', 'n8n-automation'],
+    link: { href: 'https://github.com/latharrr/linkedin-bot', label: 'github.com/latharrr/linkedin-bot' },
+    services: ['ai-agents'],
   },
   {
     slug: 'proofmart',
@@ -177,13 +139,8 @@ export const WORK: Work[] = [
       { label: 'Verdicts', value: 'FAIL · REVIEW · CLEAR' },
       { label: 'AI models in the decision path', value: '0' },
     ],
-    device: 'laptop',
-    video: 'proofmart',
-    image: '/media/proofmart-hero.jpg',
-    hero: '/media/proofmart-hero.jpg',
-    strip: ['/media/proofmart-hero.jpg', '/media/proofmart-2.jpg', '/media/proofmart-3.jpg'],
     link: { href: 'https://proofmart.shop', label: 'proofmart.shop' },
-    services: ['apps', 'ai-agents'],
+    services: ['apps'],
   },
   {
     slug: 'sangsafar',
@@ -205,11 +162,9 @@ export const WORK: Work[] = [
     results: [
       { label: 'Who can sign in', value: 'Verified college email only' },
       { label: 'Safety options', value: 'Women-only trips, request before chat' },
+      { label: 'Status', value: 'Staging only, not public yet' },
     ],
-    device: 'phone',
-    image: '/media/sangsafar-phone.jpg',
-    hero: '/media/sangsafar-01-landing.jpg',
-    strip: ['/media/sangsafar-01-landing.jpg', '/media/sangsafar-04-discover.jpg', '/media/sangsafar-06-matches.jpg', '/media/sangsafar-10-chat-accepted.jpg'],
+    strip: ['/work/sangsafar/desktop.webp', '/work/sangsafar/matches.webp', '/work/sangsafar/chat.webp'],
     services: ['apps'],
   },
   {
@@ -233,11 +188,6 @@ export const WORK: Work[] = [
       { label: 'Organic visibility', value: 'Up, with inbound client leads' },
       { label: 'Who publishes the blog', value: 'The firm’s own staff' },
     ],
-    device: 'laptop',
-    video: 'yp',
-    image: '/media/yp-hero.jpg',
-    hero: '/media/yp-hero.jpg',
-    strip: ['/media/yp-hero.jpg', '/media/yp-2.jpg', '/media/yp-3.jpg'],
     link: { href: 'https://yourprofessionals.in', label: 'yourprofessionals.in' },
     services: ['seo-performance', 'websites'],
   },
@@ -245,19 +195,84 @@ export const WORK: Work[] = [
 
 export const getWork = (slug: string) => WORK.find(w => w.slug === slug);
 
-// Homepage carousel, in order.
-export const CAROUSEL = ['picapool-crm-automation', 'picapool-ai-data-analyst', 'slspl-group', 'linkedin-autopilot', 'proofmart', 'sangsafar', 'yourprofessionals'].map(s => getWork(s)!);
+// Every project on the site, in display order. Screens are fresh captures (tools/shots.mjs) in public/work/<slug>/.
+export type Project = {
+  slug: string;
+  name: string;
+  tag: string; // one hero tag per card
+  oneLine: string;
+  device: 'laptop' | 'phone'; // which capture the carousel frame shows
+  desktop: string;
+  mobile?: string;
+  recreated?: boolean; // internal tool: drawn UI with anonymised values, labelled "Recreated UI"
+  live?: string;
+  code?: string;
+  note?: string; // credit or status, shown with the project
+  services: string[]; // service slugs this project demonstrates (tags)
+};
+const shots = (slug: string, mobile = true) => ({ desktop: `/work/${slug}/desktop.webp`, ...(mobile ? { mobile: `/work/${slug}/mobile.webp` } : {}) });
 
-// Hero orbit cards: real screen loops of live work.
-export const ORBIT_CARDS = [
-  { name: 'ProofMart', media: 'proofmart', video: true },
-  { name: 'SLSPL Group', media: 'slspl', video: true },
-  { name: 'Picapool film', media: 'picapool-film', video: true, tall: true },
-  { name: 'LpuTV', media: 'lputv', video: true },
-  { name: 'Picapool intents', media: 'intent', video: true },
-  { name: 'SangSafar', media: 'sangsafar-phone', video: false, tall: true },
-  { name: 'TrustBridgeVerify', media: 'tbv', video: true },
-  { name: 'YourProfessionals', media: 'yp', video: true },
-  { name: 'Picapool air', media: 'air', video: true },
-  { name: 'SangSafar matches', media: 'sangsafar-poster', video: false },
+export const PROJECTS: Project[] = [
+  {
+    slug: 'tulips-oven', name: 'Website for Tulip’s Oven', tag: 'Website', device: 'laptop', ...shots('tulips-oven'),
+    oneLine: 'A fast static site for a home bakery in New Delhi: menu, gallery and a blog for bakery searches.',
+    live: 'https://tulipsoven.com', services: ['websites', 'seo-performance'],
+  },
+  {
+    slug: 'gapl', name: 'Gapl', tag: 'SaaS', device: 'laptop', ...shots('gapl'),
+    oneLine: 'An early-stage product that reads a resume the way a recruiter does and shows the line that sank it.',
+    live: 'https://gapl.vercel.app', code: 'https://github.com/latharrr/gapl', note: 'Early-stage product', services: ['apps'],
+  },
+  {
+    slug: 'proofmart', name: 'ProofMart', tag: 'API', device: 'laptop', ...shots('proofmart'),
+    oneLine: 'A fraud and KYC API for PDF bank statements: six fraud markers, one verdict, no model in the path.',
+    live: 'https://proofmart.shop', services: ['apps'],
+  },
+  {
+    slug: 'yourprofessionals', name: 'YourProfessionals', tag: 'SEO', device: 'laptop', ...shots('yourprofessionals'),
+    oneLine: 'SEO, a blog CMS and lead capture for a CA and CS firm in Delhi.',
+    live: 'https://yourprofessionals.in', services: ['seo-performance', 'websites'],
+  },
+  {
+    slug: 'picapool-acquisition-campaign', name: 'Picapool acquisition campaign', tag: 'Growth', device: 'phone', ...shots('picapool-acquisition-campaign'),
+    oneLine: 'Intent landing pages with in-house attribution, so spend is judged per channel.',
+    live: 'https://plan.picapool.tech', services: ['landing-pages'],
+  },
+  {
+    slug: 'picapool-crm-automation', name: 'Picapool CRM automation', tag: 'n8n', device: 'laptop', ...shots('picapool-crm-automation', false),
+    oneLine: 'An n8n pipeline that enriches and scores each lead on arrival, feeding a role-based CRM.',
+    recreated: true, note: 'Internal tool', services: ['n8n-automation', 'whatsapp-email-automation'],
+  },
+  {
+    slug: 'picapool-ai-data-analyst', name: 'Picapool AI data analyst', tag: 'AI Agent', device: 'laptop', ...shots('picapool-ai-data-analyst', false),
+    oneLine: 'Plain-English questions turned into validated, read-only SQL.',
+    recreated: true, note: 'Internal tool, under NDA', services: ['ai-agents'],
+  },
+  {
+    slug: 'rumour-mill', name: 'Beyond the Rumour Mill', tag: 'Web App', device: 'laptop', ...shots('rumour-mill'),
+    oneLine: 'Placement prep from verified senior experiences. I built the backend, auth, experience and AI modules.',
+    live: 'https://clg.143.lat', note: 'Team college project with Harsh and Sundram Singh', services: ['apps'],
+  },
+  {
+    slug: 'linkedin-autopilot', name: 'LinkedIn autopilot', tag: 'AI Agent', device: 'laptop', ...shots('linkedin-autopilot', false),
+    oneLine: 'A Telegram AI agent that researched and drafted posts, publishing only after approval.',
+    recreated: true, code: 'https://github.com/latharrr/linkedin-bot', note: 'Stopped on 13 Nov 2026', services: ['ai-agents'],
+  },
+  {
+    slug: 'sangsafar', name: 'SangSafar', tag: 'Web App', device: 'phone', ...shots('sangsafar'),
+    oneLine: 'Travel-buddy matching for college students, limited to verified college email.',
+    note: 'Staging only', services: ['apps'],
+  },
+  {
+    slug: 'spraykart', name: 'Spraykart', tag: 'Shopify', device: 'phone', ...shots('spraykart'),
+    oneLine: 'A Shopify perfume store. My part: store set-up, catalogue configuration and running it day to day.',
+    live: 'https://www.spraykart.com', note: 'Team work with Spraykart LLP', services: ['shopify'],
+  },
 ];
+export const getProject = (slug: string) => PROJECTS.find(p => p.slug === slug)!;
+/** Case study where one exists, else the live site, else the code. */
+export function projectLink(p: Project) {
+  if (getWork(p.slug)) return { href: `/work/${p.slug}`, label: 'View case study', external: false };
+  if (p.live) return { href: p.live, label: 'Visit site', external: true };
+  return { href: p.code!, label: 'View code', external: true };
+}

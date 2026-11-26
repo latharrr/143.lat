@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import { GROUPS, SERVICES } from '@/content/services';
-import { CONTACT, PRICING, inr } from '@/content/site';
+import { PRICING, inr } from '@/content/site';
 import { Title, Lines, Reveal } from '@/components/ui/Reveal';
 
 export const metadata: Metadata = {
@@ -28,9 +28,7 @@ export default function Services() {
                 <span className="rv-line hair" aria-hidden />
                 <h3>{s.name}</h3>
                 <p>{s.short}</p>
-                {s.page
-                  ? <Link className="u strong" href={`/services/${s.slug}`} data-title={s.name}>More about {s.name} →</Link>
-                  : <a className="u strong" href={CONTACT.whatsapp} target="_blank" rel="noopener">Ask about {s.name} →</a>}
+                <Link className="u strong" href={`/services/${s.slug}`} data-title={s.name}>More about {s.name} →</Link>
               </article>
             ))}
           </div>

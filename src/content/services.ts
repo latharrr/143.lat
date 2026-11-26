@@ -1,4 +1,4 @@
-export type Group = 'Build' | 'Automate' | 'Grow' | 'Support';
+export type Group = 'Build' | 'Automate' | 'AI' | 'Grow';
 
 export type ServicePage = {
   h1: string;
@@ -18,14 +18,15 @@ export type Service = {
   name: string; // used in the big list
   group: Group;
   short: string;
-  page?: ServicePage; // launched services only
+  priceKey?: string; // short services: PRICING name for the starting price (none = quoted on call)
+  page?: ServicePage; // full page; others get the short page
 };
 
 export const GROUPS: { name: Group; line: string }[] = [
   { name: 'Build', line: 'Websites, 3D sites, apps, Shopify and landing pages.' },
-  { name: 'Automate', line: 'WhatsApp and email, n8n, AI agents, scraping and workflow fixes.' },
-  { name: 'Grow', line: 'SEO, speed, payments and booking.' },
-  { name: 'Support', line: 'A monthly retainer that keeps it all running.' },
+  { name: 'Automate', line: 'WhatsApp and email, n8n, scraping and workflow fixes.' },
+  { name: 'AI', line: 'Agents and AI features that work on your own data, with a human approval step.' },
+  { name: 'Grow', line: 'SEO, speed, payments, booking and a monthly retainer that keeps it all running.' },
 ];
 
 export const SERVICES: Service[] = [
@@ -97,7 +98,7 @@ export const SERVICES: Service[] = [
   {
     slug: 'ai-agents',
     name: 'AI Agents',
-    group: 'Automate',
+    group: 'AI',
     short: 'Agents that research, draft, answer and act inside your tools, with a human approval step.',
     page: {
       h1: 'Custom AI Agents for Businesses in India',
@@ -143,7 +144,7 @@ export const SERVICES: Service[] = [
       caseStudy: {
         work: 'linkedin-autopilot',
         title: 'LinkedIn autopilot',
-        body: 'A Telegram brief goes in. The agent researches the topic across four sources, keeps only facts it can verify, writes two drafts, merges them in my voice, makes a cover image and posts to LinkedIn only after I approve it.',
+        body: 'A Telegram brief went in. The agent researched the topic across four sources, kept only facts it could verify, wrote two drafts, merged them in my voice, made a cover image and posted to LinkedIn only after I approved it. The bot was stopped on 13 November 2026.',
       },
       process: [
         'Discovery call to pick one job worth automating',
@@ -358,14 +359,14 @@ export const SERVICES: Service[] = [
     },
   },
   // Services without their own page yet: they link to /services#slug.
-  { slug: 'websites', name: 'Business Websites', group: 'Build', short: 'Fast, clear websites with a CMS, SEO set-up and WhatsApp and booking built in.' },
-  { slug: 'landing-pages', name: 'Landing Pages', group: 'Build', short: 'One page, one offer, one action. Built to turn ad and outreach traffic into calls.' },
+  { slug: 'websites', name: 'Business Websites', group: 'Build', short: 'Fast, clear websites with a CMS, SEO set-up and WhatsApp and booking built in.', priceKey: 'Business website' },
+  { slug: 'landing-pages', name: 'Landing Pages', group: 'Build', short: 'One page, one offer, one action. Built to turn ad and outreach traffic into calls.', priceKey: 'Landing page' },
   { slug: 'apps', name: 'Web Apps', group: 'Build', short: 'Dashboards, portals and internal tools on Next.js and Supabase.' },
-  { slug: 'scraping', name: 'Scraping', group: 'Automate', short: 'Lead lists, price tracking and market data pulled on a schedule, cleaned and delivered to a sheet.' },
-  { slug: 'workflow-optimisation', name: 'Workflow Optimisation', group: 'Automate', short: 'A review of how work moves through your team, and the two or three changes that save the most hours.' },
+  { slug: 'scraping', name: 'Scraping', group: 'Automate', short: 'Lead lists, price tracking and market data pulled on a schedule, cleaned and delivered to a sheet.', priceKey: 'Automation setup' },
+  { slug: 'workflow-optimisation', name: 'Workflow Optimisation', group: 'Automate', short: 'A review of how work moves through your team, and the two or three changes that save the most hours.', priceKey: 'Automation setup' },
   { slug: 'seo-performance', name: 'SEO & Performance', group: 'Grow', short: 'Technical SEO, Core Web Vitals, schema and content structure that gets you found.' },
   { slug: 'payments-booking', name: 'Payments & Booking', group: 'Grow', short: 'Razorpay, UPI links, Cal.com and booking flows that confirm themselves on WhatsApp.' },
-  { slug: 'maintenance', name: 'Maintenance', group: 'Support', short: 'A monthly retainer for updates, monitoring, backups and small features.' },
+  { slug: 'maintenance', name: 'Maintenance', group: 'Grow', short: 'A monthly retainer for updates, monitoring, backups and small features.', priceKey: 'Monthly retainer' },
 ];
 
 // Order for the big homepage list.
@@ -374,6 +375,24 @@ export const LIST_ORDER = [
   'apps', 'seo-performance', 'scraping', 'workflow-optimisation', 'payments-booking', 'maintenance',
 ];
 
-export const serviceHref = (s: Service) => (s.page ? `/services/${s.slug}` : `/services#${s.slug}`);
+export const serviceHref = (s: Service) => `/services/${s.slug}`;
+
+// Projects that actually demonstrate each service (slugs in content/work.ts PROJECTS), first = featured.
+// An empty list hides the preview: no project, no picture.
+export const SERVICE_PROJECTS: Record<string, string[]> = {
+  shopify: ['spraykart'],
+  'ai-agents': ['linkedin-autopilot', 'picapool-ai-data-analyst'],
+  'n8n-automation': ['picapool-crm-automation'],
+  'whatsapp-email-automation': ['picapool-crm-automation'],
+  '3d-websites': [],
+  websites: ['tulips-oven', 'yourprofessionals'],
+  'landing-pages': ['picapool-acquisition-campaign'],
+  apps: ['gapl', 'sangsafar', 'rumour-mill'],
+  'seo-performance': ['yourprofessionals'],
+  scraping: ['picapool-crm-automation'],
+  'workflow-optimisation': ['picapool-crm-automation'],
+  'payments-booking': [],
+  maintenance: [],
+};
 export const getService = (slug: string) => SERVICES.find(s => s.slug === slug);
 export const launched = SERVICES.filter(s => s.page);
