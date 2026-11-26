@@ -55,18 +55,18 @@ export const PRICING = [
   { name: 'Monthly retainer', from: 10000, unit: '/month', note: 'Updates, monitoring, small features and a same-week response.' },
 ];
 
-export type Logo = { name: string; src: string; href: string };
+export type Logo = { name: string; src: string; w: number; h: number; href: string }; // w/h = SVG viewBox size (intrinsic ratio)
 
 export const PROOF = {
   shipped: 50, // shown as "50+"
   // SVG marks only. `href` is the case study or the live site.
   logos: [
-    { name: 'Picapool', src: '/logos/picapool.svg', href: '/work/picapool-acquisition-campaign' },
-    { name: 'YourProfessionals', src: '/logos/yourprofessionals.svg', href: '/work/yourprofessionals' },
-    { name: 'Spraykart', src: '/logos/spraykart.svg', href: 'https://www.spraykart.com' },
-    { name: 'Tulip’s Oven', src: '/logos/tulips-oven.svg', href: 'https://tulipsoven.com' },
-    { name: 'Gapl', src: '/logos/gapl.svg', href: 'https://gapl.vercel.app' },
-    { name: 'ProofMart', src: '/logos/proofmart.svg', href: '/work/proofmart' },
+    { name: 'Picapool', src: '/logos/picapool.svg', w: 550, h: 120, href: '/work/picapool-acquisition-campaign' },
+    { name: 'YourProfessionals', src: '/logos/yourprofessionals.svg', w: 635, h: 189, href: '/work/yourprofessionals' },
+    { name: 'Spraykart', src: '/logos/spraykart.svg', w: 856, h: 245, href: 'https://www.spraykart.com' },
+    { name: 'Tulip’s Oven', src: '/logos/tulips-oven.svg', w: 741, h: 101, href: 'https://tulipsoven.com' },
+    { name: 'Gapl', src: '/logos/gapl.svg', w: 201, h: 118, href: 'https://gapl.vercel.app' },
+    { name: 'ProofMart', src: '/logos/proofmart.svg', w: 465, h: 88, href: '/work/proofmart' },
   ] as Logo[],
 };
 

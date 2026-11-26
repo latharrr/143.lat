@@ -14,7 +14,7 @@ page.on('pageerror', e => errors.push(`pageerror ${e.message}`));
 page.on('console', m => (m.type() === 'error' || /hydrat/i.test(m.text())) && errors.push(`console ${m.text().slice(0, 240)}`));
 await page.addInitScript(() => {
   window.__cls = 0;
-  new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) window.__cls += e.value; }).observe({ type: 'layout-shift', buffered: true });
+  new PerformanceObserver(l => { for (const e of l.getEntries()) if (!e.hadRecentInput) { window.__cls += e.value; if (e.value > 0.01) (window.__big ??= []).push([+e.value.toFixed(3), Math.round(scrollY), ...(e.sources || []).slice(0, 2).map(s => s.node?.className?.toString?.().slice(0, 40) || s.node?.nodeName)]); } }).observe({ type: 'layout-shift', buffered: true });
 });
 await page.goto(base + '/', { waitUntil: 'networkidle', timeout: 90000 }).catch(() => {});
 await page.waitForTimeout(2500);
@@ -49,5 +49,5 @@ if (wk != null) {
 }
 const pr = await top('.pricing'); if (pr != null) { await scrollTo(pr - 20); await shot('pricing'); }
 const pf = await top('.proof'); if (pf != null) { await scrollTo(pf - 20); await page.waitForTimeout(1500); await shot('proof'); if (!mobile) { await page.locator('.logo-row a').nth(1).hover(); await page.waitForTimeout(600); await shot('proof-hover'); } }
-console.log(JSON.stringify({ tag, cls: await page.evaluate(() => window.__cls), errors: errors.slice(0, 8) }));
+console.log(JSON.stringify({ tag, cls: await page.evaluate(() => window.__cls), big: await page.evaluate(() => (window.__big || []).slice(0, 12)), errors: errors.slice(0, 8) }));
 await browser.close();

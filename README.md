@@ -19,21 +19,23 @@ Every section runs inside `useGSAP`, so it is reverted on route change. With red
 | Animation | File | Adjust |
 |---|---|---|
 | Smooth scroll | `lib/motion.ts` `useLenis` | `lerp`, `wheelMultiplier` |
-| Hero intro (chars rise, cards pop) | `components/home/Hero.tsx` | `useSplitReveal(... stagger, duration)`, cards `back.out(1.6)` `stagger: 0.05` |
+| Hero intro (chars rise, showreel rises) | `components/home/Hero.tsx` | `useSplitReveal(... stagger, duration)`; `.reel-frame` `y: 60` over `1.2 s` |
 | Hero audience ticker | `Hero.tsx` (roll timeline) | `+=1.6` hold + `0.6` roll = 2.2 s per word |
-| Hero scroll (headline dims, cards orbit, clay drift) | `Hero.tsx` `usePinScenes(root, 2, …, { sticky: true })` | CSS `position: sticky` inside `.hero-pin` (no GSAP pin-spacer, so no layout shift); scroll length is `.hero-pin` height in `globals.css`; card `data-speed` in `SLOTS` |
-| Hero rest layout | `Hero.tsx` first `useGSAP` | slots in `SLOTS` (one project card + tag each); the solver pushes cards outward until they clear the headline and CTAs. Check with `node tools/check-hero.mjs 1440 800` |
+| Hero scroll (headline dims, showreel rises and flattens, clay drift) | `Hero.tsx` `usePinScenes(root, 2, …, { sticky: true })` | CSS `position: sticky` inside `.hero-pin` (no GSAP pin-spacer, so no layout shift); scroll length is `.hero-pin` height in `globals.css`; reel tilt `14°`, rise `0.6` (phones `0.16`) × viewport. Check with `node tools/check-hero.mjs 1440 900 <base>` |
+| Hero showreel | `components/home/Showreel.tsx` | sources load after `window.load` when near the viewport, pause off-screen; poster only with reduced motion; chip timeline in `src/content/reel.json` |
 | Clay 3D objects | `components/clay/` | positions, sizes, drift in `CLAY` / `KNOT`; WebP fallbacks via `node tools/clay-png.mjs` (dev server running) |
 | Manifesto scroll fill | `components/home/Manifesto.tsx` | `useScrubFill(ref, 'top 75%', 'bottom 40%')` |
 | Services stack (Build, Automate, AI, Grow) | `components/home/ServicesShowcase.tsx` | next card slides over in `0.45`, outgoing card scales to `0.9` + shade `0.55`; screenshots per card in `MOCKS` (positions `.m1`–`.m4` in `globals.css`); parallax `45 × depth`, mouse tilt `10°/7°`. Phones: sticky stacking, scale `0.92` |
 | Curtain (light rises over the stage) | `ServicesShowcase.tsx` last segment + `.showcase + .paper { margin-top: -100vh }` | scale `0.95`, dim `0.4` |
 | Big service list | `components/home/ServiceList.tsx` | colour/weight peak at `0.25 → 1.25`; previews come from `SERVICE_PROJECTS` in `services.ts` (empty = no preview), cycle every `1.4 s` |
-| Work carousel | `components/home/WorkCarousel.tsx` | all of `PROJECTS`; `spacing` (vw), blur `3px`, lift `2vh`, pin length `220%`, fling `260`; friction in `useVelocityCarousel` |
+| Work carousel | `components/home/WorkCarousel.tsx` | all of `PROJECTS`; `spacing` (vw), blur `3px`, lift `2vh`, fling `260`; friction in `useVelocityCarousel`. Scroll length is `.wc-pin` height in `globals.css` (sticky, like the hero; a GSAP pin here caused layout shift) |
 | Inner page title | `components/ui/Reveal.tsx` `Title` | stagger `0.04`, rotation ±4° |
 | Expanding hero image | `components/inner/Inner.tsx` `ExpandHero` | `start`/`end`, inset `2%`, overlay `0.25` |
 | Line reveals | `Reveal.tsx` `Lines` | stagger `0.08`, start `top 80%` |
 | Pill switcher, image strip | `Inner.tsx` | scroll-spy `top 55%`; strip slide width `64vw` |
 | Header hide, menu, cursor, page transitions | `components/shell/Shell.tsx` | header `0.4 s`; menu clip-path `0.7 s`; curtain `0.6 s power3.inOut` |
+
+Showreel: `node tools/reel.mjs desktop|mobile [slug …]` records each project (CDP screencast while a scripted scroll / hover / click plays; recreated UIs need `npm run dev`), then `python3 tools/reel-build.py desktop|mobile` resamples to 30 fps, crossfades, loops and encodes AV1 + H.264 under 2.5 MB (desktop) / 1.2 MB (phones) into `public/reel/`. `--sheet` writes a contact sheet to review shots first. SangSafar is staging-only, so its shot scrolls the real staging screenshot.
 
 Screenshots: `node tools/shots.mjs [slug …]` refreshes `public/work/<slug>/{desktop,mobile}.webp` from the live sites (1440 and 390, 2× DPR). Internal tools are captured from the dev-only `/capture/<slug>` recreated UIs (`npm run dev` first). Project list, links and tags: `PROJECTS` in `src/content/work.ts`.
 

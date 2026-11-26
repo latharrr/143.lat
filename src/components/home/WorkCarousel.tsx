@@ -70,18 +70,19 @@ export function WorkCarousel() {
   // Info card + glow react to the new centre.
   useGSAP(() => {
     if (isReduced()) return;
-    gsap.fromTo('.wc-info > *', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: EASE.reveal });
+    gsap.fromTo('.wi-panel.is-on > *', { opacity: 0, y: 8 }, { opacity: 1, y: 0, duration: 0.4, stagger: 0.04, ease: EASE.reveal });
     gsap.fromTo('.wc-glow', { opacity: 0.55, scale: 0.92 }, { opacity: 1, scale: 1, duration: 0.9, ease: EASE.reveal });
   }, { scope: root, dependencies: [centre] });
 
   useGSAP(() => {
     const sec = root.current!;
     const stage = sec.querySelector<HTMLElement>('.wc-stage')!;
-    // Pinned scroll drives the carousel: one full loop over the pin.
+    // Scroll drives the carousel while the section is sticky inside .wc-pin (CSS, no GSAP pin-spacer, so no layout
+    // shift); .wc-pin's extra height (220vh, phones 150vh) is the scroll distance for one loop.
     gsap.matchMedia(sec).add('(prefers-reduced-motion: no-preference)', () => {
       let last = 0;
       ScrollTrigger.create({
-        trigger: sec, start: 'top top', end: () => `+=${isMobile() ? 150 : 220}%`, pin: true,
+        trigger: sec.parentElement, start: 'top top', end: 'bottom bottom',
         onUpdate: s => { car.push((s.progress - last) * (N - 1)); last = s.progress; },
       });
     });
@@ -129,9 +130,8 @@ export function WorkCarousel() {
     };
   }, { scope: root });
 
-  const p = PROJECTS[centre];
-  const l = projectLink(p);
   return (
+    <div className="wc-pin">
     <section ref={root} className="work light-cream" aria-labelledby="wc-title">
       <h2 id="wc-title" className="wc-title">Selected work</h2>
       <div className="wc-blob" aria-hidden>
@@ -148,14 +148,23 @@ export function WorkCarousel() {
           <ItemLink key={w.slug} p={w} i={i} onFocus={() => car.goTo(i)} setRef={el => { if (el) items.current[i] = el; }} />
         ))}
       </div>
+      {/* Every project's info sits in one grid cell and only the centred one is visible, so the box keeps the size of
+          the tallest entry and nothing moves when the centre changes (no layout shift). */}
       <div className="wc-info" aria-live="polite">
-        <p className="wi-name">{p.name}{p.recreated && <span className="tag-recreated">Recreated UI</span>}</p>
-        <p className="wi-result">{p.oneLine}</p>
-        {p.note && <p className="wi-note">{p.note}</p>}
-        <ul className="wi-tags">{p.services.map(s => <li key={s}>{getService(s)!.name}</li>)}</ul>
-        {l.external
-          ? <a className="wi-link u strong" href={l.href} target="_blank" rel="noopener">{l.label} ↗</a>
-          : <Link className="wi-link u strong" href={l.href} data-title={p.name}>{l.label} →</Link>}
+        {PROJECTS.map((p, i) => {
+          const l = projectLink(p);
+          return (
+            <div key={p.slug} className={`wi-panel${i === centre ? ' is-on' : ''}`}>
+              <p className="wi-name">{p.name}{p.recreated && <span className="tag-recreated">Recreated UI</span>}</p>
+              <p className="wi-result">{p.oneLine}</p>
+              {p.note && <p className="wi-note">{p.note}</p>}
+              <ul className="wi-tags">{p.services.map(s => <li key={s}>{getService(s)!.name}</li>)}</ul>
+              {l.external
+                ? <a className="wi-link u strong" href={l.href} target="_blank" rel="noopener">{l.label} ↗</a>
+                : <Link className="wi-link u strong" href={l.href} data-title={p.name}>{l.label} →</Link>}
+            </div>
+          );
+        })}
       </div>
       <div className="wc-nav">
         <button onClick={() => car.push(-1)} aria-label="Previous project">←</button>
@@ -163,5 +172,6 @@ export function WorkCarousel() {
         <button onClick={() => car.push(1)} aria-label="Next project">→</button>
       </div>
     </section>
+    </div>
   );
 }

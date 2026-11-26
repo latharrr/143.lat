@@ -5,7 +5,7 @@ export function Browser({ src, url, className = '' }: { src: string; url: string
   return (
     <div className={`mk mk-browser ${className}`}>
       <div className="mk-bar"><i /><i /><i /><span>{url}</span></div>
-      <div className="mk-screen"><Image src={src} alt="" fill sizes="(max-width: 767px) 80vw, 40vw" /></div>
+      <div className="mk-screen"><Image src={src} alt="" fill sizes="(max-width: 767px) 50vw, 40vw" /></div>
     </div>
   );
 }
@@ -14,7 +14,7 @@ export function Phone({ src, className = '', children }: { src?: string; classNa
   return (
     <div className={`mk mk-phone ${className}`}>
       <div className="mk-notch" />
-      <div className="mk-screen">{src ? <Image src={src} alt="" fill sizes="240px" /> : children}</div>
+      <div className="mk-screen">{src ? <Image src={src} alt="" fill sizes="(max-width: 767px) 26vw, 240px" /> : children}</div>
     </div>
   );
 }
