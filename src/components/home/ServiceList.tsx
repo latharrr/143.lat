@@ -6,9 +6,9 @@
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { gsap, useGSAP, isReduced, isTouch, fadeIn } from '@/lib/motion';
-import Image from 'next/image';
 import { LIST_ORDER, SERVICE_PROJECTS, getService, serviceHref } from '@/content/services';
 import { getProject } from '@/content/work';
+import { Clip, useClips } from '@/components/ui/Clip';
 
 // Preview per service: the projects that demonstrate it (cycled while hovered). No project = no preview.
 const SHOTS = [...new Set(Object.values(SERVICE_PROJECTS).flat())].map(getProject);
@@ -24,6 +24,10 @@ export function ServiceList() {
     on(); mq.addEventListener('change', on);
     return () => mq.removeEventListener('change', on);
   }, []);
+
+  // Previews loop their project's screen recording; a clip plays only while its preview is shown (hidden ones are
+  // display:none, closed accordions have no height). Re-scan when the phone accordions render.
+  useClips(root, undefined, phone);
 
   useGSAP(() => {
     const words = gsap.utils.toArray<HTMLElement>('.sl-item', root.current);
@@ -111,7 +115,7 @@ export function ServiceList() {
                     <div className="sl-acc-shots">
                       {projects.slice(0, 2).map(p => (
                         <figure key={p.slug} className={p.device === 'phone' ? 'is-phone' : undefined}>
-                          <span><Image src={p.device === 'phone' ? p.mobile! : p.desktop} alt="" fill sizes="45vw" /></span>
+                          <span><Clip kind={p.device === 'phone' ? 'port' : 'land'} slug={p.slug} /></span>
                           <figcaption>{p.name}</figcaption>
                         </figure>
                       ))}
@@ -127,7 +131,7 @@ export function ServiceList() {
       <div ref={card} className="sl-card" aria-hidden>
         {SHOTS.map(p => (
           <div key={p.slug} data-shot={p.slug} className={p.device === 'phone' ? 'is-phone' : undefined} hidden>
-            <Image src={p.device === 'phone' ? p.mobile! : p.desktop} alt="" fill sizes="260px" />
+            <Clip kind={p.device === 'phone' ? 'port' : 'land'} slug={p.slug} />
           </div>
         ))}
         <figcaption />

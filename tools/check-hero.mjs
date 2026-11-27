@@ -1,29 +1,50 @@
-// Asserts the hero rest state: the showreel frame overlaps no headline glyph, lead line or CTA, and the lead + CTAs
-// sit inside the first viewport. Also reports how much of the frame shows at rest. node tools/check-hero.mjs <w> <h> [url]
+// Asserts the hero card rules at one viewport: no card (its rotated on-screen box) inside the safe zone (eyebrow,
+// headline, subline, CTAs + 32 px), no card on another card, no duplicate tags, no card cropped beyond a 15% edge
+// bleed, no horizontal page scroll. Checked at rest and with the mouse in two opposite corners (max parallax), and
+// after a hover. node tools/check-hero.mjs <w> <h> [url] [--shot file.png]
 import { chromium } from 'playwright-core';
-const [w, h, url = 'http://localhost:3000'] = process.argv.slice(2);
+const args = process.argv.slice(2);
+const shot = args.includes('--shot') ? args[args.indexOf('--shot') + 1] : null;
+const [w, h, url = 'http://localhost:3000'] = args.filter((a, i) => !a.startsWith('--') && args[i - 1] !== '--shot');
 const b = await chromium.launch({ channel: 'chrome', headless: true });
 const p = await b.newPage({ viewport: { width: +w, height: +h } });
 await p.goto(url, { waitUntil: 'networkidle' });
-await p.waitForTimeout(3200); // intro done
-const r = await p.evaluate(() => {
-  const box = e => { const r = e.getBoundingClientRect(); return { l: r.left, t: r.top, r: r.right, b: r.bottom }; };
-  const h1 = document.querySelector('.hero-title');
-  const range = document.createRange(); range.selectNodeContents(h1);
-  // glyph boxes: one rect per split char (SplitText) or per text line
-  const chars = [...h1.querySelectorAll('div div, div > span')].filter(e => e.textContent.trim().length === 1);
-  const glyphs = (chars.length ? chars.map(box) : [...range.getClientRects()].map(x => ({ l: x.left, t: x.top, r: x.right, b: x.bottom })));
+await p.waitForTimeout(3400); // intro done
+const measure = () => p.evaluate(() => {
+  const box = r => ({ l: r.left, t: r.top, r: r.right, b: r.bottom });
+  // Headline: its line boxes (line-height 0.9) hold the cap glyphs; the text range would add the font's empty descender area.
+  const pad = (x, d) => ({ l: x.l - d, t: x.t - d, r: x.r + d, b: x.b + d });
   const hit = (a, c) => a.l < c.r && a.r > c.l && a.t < c.b && a.b > c.t;
-  const things = [...document.querySelectorAll('.reel-frame')].map(e => ({ name: 'showreel', ...box(e) }));
-  const lead = document.querySelector('.hero-lead'); const lr = document.createRange(); lr.selectNodeContents(lead);
-  const centreBoxes = [...lr.getClientRects()].map(x => ({ l: x.left, t: x.top, r: x.right, b: x.bottom })).concat([...document.querySelectorAll('.hero-centre .btn')].map(box));
-  const centre = box(document.querySelector('.hero-centre'));
-  const overlapsHead = things.filter(t => glyphs.some(g => hit(t, g))).map(t => t.name);
-  const overlapsCentre = things.filter(t => centreBoxes.some(c => hit(t, c))).map(t => t.name);
-  const btns = [...document.querySelectorAll('.hero-centre .btn')].map(box);
-  const f = things[0];
-  return { overlapsHead, overlapsCentre, reel: f && { top: Math.round(f.t), shown: Math.round(Math.max(0, Math.min(innerHeight, f.b) - f.t)), h: Math.round(f.b - f.t) }, centreBottom: Math.round(centre.b), ctaBottom: Math.round(Math.max(...btns.map(x => x.b))), vh: innerHeight, glyphs: glyphs.length };
+  const text = el => { const g = document.createRange(); g.selectNodeContents(el); const rs = [...g.getClientRects()].filter(r => r.width); return { l: Math.min(...rs.map(r => r.left)), t: Math.min(...rs.map(r => r.top)), r: Math.max(...rs.map(r => r.right)), b: Math.max(...rs.map(r => r.bottom)) }; };
+  const safe = { eyebrow: box(document.querySelector('.hero-eyebrow').getBoundingClientRect()), headline: box(document.querySelector('.hero-title').getBoundingClientRect()), subline: text(document.querySelector('.hero-lead')), ctas: box(document.querySelector('.btn-row').getBoundingClientRect()) };
+  const cards = [...document.querySelectorAll('.hc, .hr')].filter(a => a.offsetParent).map(a => ({ name: a.querySelector('.hc-name').textContent, tag: a.querySelector('.hc-tag').textContent, row: a.classList.contains('hr'), ...box(a.querySelector('.hc-card').getBoundingClientRect()) }));
+  const bad = [];
+  for (const c of cards) {
+    for (const [k, s] of Object.entries(safe)) {
+      if (hit(c, s)) bad.push(`${c.name} overlaps ${k}`);
+      else if (!c.row && hit(c, pad(s, 32))) bad.push(`${c.name} inside ${k} + 32px`);
+    }
+    if (!c.row) {
+      const bw = (c.r - c.l) * 0.15, bh = (c.b - c.t) * 0.15;
+      if (c.l < -bw - 0.5 || c.r > innerWidth + bw + 0.5 || c.b > innerHeight + bh + 0.5 || c.t < 0) bad.push(`${c.name} cropped beyond 15%`);
+    }
+  }
+  const flat = cards.filter(c => !c.row);
+  flat.forEach((a, i) => flat.slice(i + 1).forEach(c => hit(a, c) && bad.push(`${a.name} overlaps ${c.name}`)));
+  const tags = cards.filter(c => !c.row).map(c => c.tag);
+  const dup = tags.filter((t, i) => tags.indexOf(t) !== i);
+  if (dup.length) bad.push('duplicate tags ' + dup.join(', '));
+  if (document.documentElement.scrollWidth > innerWidth) bad.push('horizontal scroll ' + document.documentElement.scrollWidth);
+  return { k: getComputedStyle(document.querySelector('.hero-cards')).getPropertyValue('--k'), cards: cards.length, tags, bad };
 });
-console.log(w + 'x' + h, JSON.stringify(r));
+const out = { rest: await measure() };
+if (+w >= 768) {
+  for (const [n, x, y] of [['tl', 2, 2], ['br', +w - 2, +h - 2]]) { await p.mouse.move(x, y, { steps: 4 }); await p.waitForTimeout(1300); out[n] = (await measure()).bad; }
+  const first = p.locator('.hc').first(); await first.hover({ force: true }); await p.waitForTimeout(700); out.hover = (await measure()).bad;
+  await p.mouse.move(+w / 2, +h - 2); await p.waitForTimeout(900);
+}
+if (shot) await p.screenshot({ path: shot });
+const bad = [...out.rest.bad, ...(out.tl ?? []), ...(out.br ?? []), ...(out.hover ?? [])];
+console.log(`${w}x${h}`, JSON.stringify({ k: out.rest.k, cards: out.rest.cards, tags: out.rest.tags.join('/'), bad: [...new Set(bad)] }));
 await b.close();
-process.exitCode = r.overlapsHead.length || r.overlapsCentre.length || r.ctaBottom > r.vh ? 1 : 0;
+process.exitCode = bad.length ? 1 : 0;

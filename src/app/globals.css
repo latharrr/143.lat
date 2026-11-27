@@ -117,25 +117,42 @@ ul, ol { list-style: none; }
 /* Mask shows 1.6em; slots are 2.6em apart, so the outgoing word has fully left before the next one enters. */
 .tick-list > span { display: block; height: 2.6em; line-height: 1.6em; }
 .hero-title { font-size: clamp(64px, 11vw, 200px); line-height: 0.9; font-weight: 700; letter-spacing: -0.045em; text-transform: uppercase; }
-/* Showreel under the CTAs: browser frame (desktop) / phone frame with the 9:16 cut (phones). Starts tilted back and
-   peeking from the bottom of the stage; the scrubbed hero timeline raises and flattens it. Lavender glow behind. */
-.reel { position: relative; z-index: 5; width: min(1000px, 72vw); margin-top: clamp(36px, 6vh, 64px); }
-.reel::before { content: ''; position: absolute; inset: -10% -12%; z-index: -1; background: radial-gradient(closest-side, rgba(217, 204, 249, 0.34), rgba(217, 204, 249, 0) 72%); filter: blur(24px); pointer-events: none; }
-.reel-tilt { transform: perspective(1400px) rotateX(14deg) scale(0.94); transform-origin: 50% 0; }
-.reel-frame { position: relative; border-radius: var(--r16); overflow: hidden; background: #101011; box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.85), 0 0 0 1px rgba(255, 255, 255, 0.08), 0 0 60px -10px rgba(217, 204, 249, 0.25); }
-.reel-bar { display: flex; align-items: center; gap: 6px; height: 30px; padding: 0 14px; background: #1c1c1e; }
-.reel-bar i { width: 9px; height: 9px; border-radius: 50%; background: #3b3b3f; }
-.reel-screen { position: relative; aspect-ratio: 16 / 10; background: #151515; }
-.reel-poster, .reel-screen video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; }
-.reel-screen video { opacity: 0; transition: opacity 0.5s; }
-.reel-screen video.is-on { opacity: 1; }
-.reel-chip { position: absolute; left: 14px; bottom: 14px; z-index: 2; display: inline-flex; align-items: center; gap: 7px; padding: 6px 12px 6px 10px; border-radius: 99px; background: rgba(18, 18, 18, 0.74); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--on-dark); font-size: 12px; font-weight: 500; line-height: 1; white-space: nowrap; }
-.reel-chip::before { content: ''; width: 6px; height: 6px; border-radius: 50%; background: var(--lav); }
-@media (prefers-reduced-motion: reduce) { .reel-tilt { transform: perspective(1400px) rotateX(8deg); } }
 .hero-centre { position: relative; z-index: 4; margin-top: clamp(20px, 3.5vh, 36px); width: min(560px, calc(100vw - 32px)); display: grid; gap: 22px; justify-items: center; }
 .hero-centre::before { content: ''; position: absolute; inset: -48px -72px; z-index: -1; background: radial-gradient(closest-side, rgba(22, 22, 22, 0.9) 60%, rgba(22, 22, 22, 0)); pointer-events: none; }
 .js-motion .hero-centre > * { visibility: hidden; animation: failsafe 0s 2.5s forwards; }
 .hero-lead { font-size: clamp(22px, 2.3vw, 34px); line-height: 1.2; font-weight: 300; letter-spacing: -0.02em; }
+
+/* Project clips (components/ui/Clip.tsx): poster under the video; the video fades in once it actually plays. */
+.clip-poster, .clip-video { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: top; pointer-events: none; }
+.clip-video { opacity: 0; transition: opacity 0.4s; }
+.clip-video.is-on { opacity: 1; }
+/* Hero cards (HeroCards.tsx): positions + --k come from placeCards(); hidden until placed so nothing jumps. */
+.hero-cards { position: absolute; inset: 0; z-index: 5; pointer-events: none; --k: 0.8; visibility: hidden; }
+.hero-cards[data-placed] { visibility: visible; }
+.hc { position: absolute; left: 0; top: 0; pointer-events: auto; outline-offset: 6px; border-radius: 16px; }
+.hc-par { display: block; }
+.hc-card { position: relative; display: block; overflow: hidden; border-radius: 16px; background: #1b1b1d; border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 18px 40px -18px rgba(0, 0, 0, 0.7), 0 2px 8px rgba(0, 0, 0, 0.25);
+  transform: rotate(var(--r, 0deg)); transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1), box-shadow 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.hc-card.is-land { width: calc(300px * var(--k)); height: calc(190px * var(--k)); }
+.hc-card.is-port { width: calc(170px * var(--k)); height: calc(300px * var(--k)); }
+.hc:hover .hc-card, .hc:focus-visible .hc-card { transform: rotate(0deg) scale(1.04); box-shadow: 0 34px 60px -22px rgba(0, 0, 0, 0.85), 0 4px 14px rgba(0, 0, 0, 0.3); }
+.hc-tag { position: absolute; top: 8px; right: 8px; z-index: 2; padding: 4px 9px; border-radius: 99px; background: rgba(18, 18, 18, 0.78); color: var(--on-dark);
+  font-size: 11px; font-weight: 500; line-height: 1.2; white-space: nowrap; backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+.hc-name { position: absolute; left: 8px; right: 8px; bottom: 8px; z-index: 2; width: fit-content; max-width: calc(100% - 16px); padding: 5px 10px; border-radius: 99px; background: var(--lav); color: #151515;
+  font-size: 12px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; opacity: 0; translate: 0 6px; transition: opacity 0.3s, translate 0.3s; }
+.hc:hover .hc-name, .hc:focus-visible .hc-name { opacity: 1; translate: 0 0; }
+/* Phones: one swipeable row of portrait cards under the CTAs. */
+.hero-row { display: none; }
+@media (prefers-reduced-motion: reduce) { .hc-card { transition: none; } .hc:hover .hc-card { transform: rotate(var(--r, 0deg)); } }
+@media (max-width: 767px) {
+  .hero-cards { display: none; }
+  .hero-row { position: relative; z-index: 3; display: flex; gap: 12px; width: 100vw; margin-top: 32px; padding: 6px 16px 14px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; pointer-events: auto; }
+  .hero-row::-webkit-scrollbar { display: none; }
+  .hero-row .hr { flex: none; border-radius: 16px; }
+  .hero-row .hc-card { width: 140px; height: 250px; transform: none; }
+  .hero-row .hc-tag { top: 7px; right: 7px; font-size: 10px; padding: 3px 8px; }
+}
 
 /* Clay 3D + PNG fallbacks */
 .clay { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
@@ -145,16 +162,6 @@ ul, ol { list-style: none; }
 .hero-clay { z-index: 1; }
 
 /* ---------- 2. Manifesto ---------- */
-/* Pulled up into the end of the hero pin (only when the hero actually pins). */
-/* Hero "pin": the hero is sticky inside .hero-pin, whose extra height is the scrubbed distance (200vh, phones 150vh,
-   matching usePinScenes). Pure CSS, present from first paint: no pin-spacer, no layout shift. */
-@media (prefers-reduced-motion: no-preference) {
-  .hero-pin { height: calc(max(100svh, 620px) + 200vh); }
-  .hero-pin > .hero { position: sticky; top: 0; }
-}
-@media (prefers-reduced-motion: no-preference) and (max-width: 767px) { .hero-pin { height: calc(max(100svh, 560px) + 150vh); } }
-@media (prefers-reduced-motion: no-preference) { .manifesto { margin-top: -25vh; } }
-@media (prefers-reduced-motion: no-preference) and (max-width: 767px) { .manifesto { margin-top: -40vh; } }
 .manifesto { position: relative; z-index: 5; padding: 48px var(--gutter) clamp(48px, 8vh, 96px); background: linear-gradient(to bottom, rgba(22, 22, 22, 0), var(--dark) 96px); }
 .manifesto .eyebrow { text-align: center; color: var(--soft-d); opacity: 1; }
 .manifesto-text { max-width: 1100px; margin: 0 auto; text-align: center; font-size: clamp(26px, 3.1vw, 44px); line-height: 1.28; letter-spacing: -0.02em; font-weight: 400; }
@@ -305,14 +312,13 @@ ul, ol { list-style: none; }
 .sl-list.is-hover .sl-item.is-hot { color: var(--ink) !important; font-weight: 600 !important; }
 .sl-card { position: fixed; left: 0; top: 0; z-index: 30; width: 260px; aspect-ratio: 4 / 3; margin: -98px 0 0 24px; border-radius: var(--r12); overflow: hidden; pointer-events: none; opacity: 0; scale: 1; transform: scale(0.6); box-shadow: 0 30px 60px -20px rgba(0, 0, 0, 0.45); background: #222; }
 .sl-card > div { position: absolute; inset: 0; }
-.sl-card img { object-fit: cover; object-position: top; }
 .sl-card .is-phone { background: linear-gradient(160deg, #efe9ff, #e7efe9); }
-.sl-card .is-phone img { object-fit: contain; padding: 10px 0; }
+.sl-card .is-phone :is(img, video) { object-fit: contain; padding: 10px 0; }
 .sl-card figcaption { position: absolute; left: 10px; bottom: 10px; font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 99px; background: var(--paper); }
 
 /* ---------- 6. Work carousel ---------- */
 .work { position: relative; height: 100vh; height: 100svh; min-height: 640px; overflow: hidden; touch-action: pan-y; }
-/* Carousel "pin": sticky inside .wc-pin, whose extra height is the scroll distance (same approach as .hero-pin). */
+/* Carousel "pin": sticky inside .wc-pin, whose extra height is the scroll distance (no GSAP pin-spacer, so no layout shift). */
 @media (prefers-reduced-motion: no-preference) {
   .wc-pin { height: calc(max(100svh, 640px) + 220vh); }
   .wc-pin > .work { position: sticky; top: 0; }
@@ -342,7 +348,6 @@ ul, ol { list-style: none; }
 .wc-screen { position: relative; display: block; overflow: hidden; background: #fff; }
 .is-laptop .wc-screen { aspect-ratio: 16 / 10; border-radius: 6px; }
 .is-phone .wc-screen { aspect-ratio: 9 / 19.5; border-radius: 22px; }
-.wc-screen img { object-fit: cover; object-position: top; pointer-events: none; }
 .wc-info { position: absolute; left: 50%; bottom: 11vh; translate: -50% 0; z-index: 4; width: min(440px, calc(100% - 32px)); display: grid; padding: 16px 20px; border-radius: var(--r12); background: var(--paper); color: var(--ink); text-align: center; box-shadow: 0 20px 40px -20px rgba(60, 10, 20, 0.5); }
 .wi-panel { grid-area: 1 / 1; align-self: center; display: grid; justify-items: center; gap: 6px; visibility: hidden; }
 .wi-panel.is-on { visibility: visible; }
@@ -545,15 +550,11 @@ ul, ol { list-style: none; }
   .hero-top { inset: 12vh 0 auto; padding: 0 16px; }
   .hero-title { font-size: clamp(40px, 12.4vw, 64px); }
   .hero-lead { font-size: 20px; }
-  /* Phones: the knot sat behind the headline; park it in the lower-right corner beside the showreel (overrides the inline position). */
+  /* Phones (overrides the inline positions): flower behind the right end of the card row, knot and blob under it. */
   .hero-clay .clay-png[data-clay="knot"] { left: 90% !important; top: 97% !important; }
+  .hero-clay .clay-png[data-clay="flower"] { left: 93% !important; top: 62% !important; }
+  .hero-clay .clay-png[data-clay="blob"] { left: 16% !important; top: 98% !important; }
   .hero-rings { top: 86%; }
-  .reel { width: min(56vw, 240px); margin-top: 28px; }
-  .reel-frame { border-radius: 30px; padding: 6px; background: #0c0c0d; }
-  .reel-frame::before { content: ''; position: absolute; left: 50%; top: 13px; z-index: 3; width: 30%; height: 13px; translate: -50% 0; border-radius: 99px; background: #0c0c0d; }
-  .reel-bar { display: none; }
-  .reel-screen { aspect-ratio: 9 / 16; border-radius: 24px; overflow: hidden; }
-  .reel-chip { left: 8px; bottom: 8px; padding: 5px 9px 5px 8px; font-size: 10px; gap: 5px; }
   .manifesto { padding: 48px 16px; }
   .sc-coda { width: auto; flex-direction: column; align-items: flex-start; padding: 8px 16px 0; align-self: stretch; }
   .manifesto-text { font-size: 24px; text-align: left; }
@@ -586,9 +587,8 @@ ul, ol { list-style: none; }
   .sl-acc-shots:has(figure:only-child) { grid-template-columns: minmax(0, 0.7fr); justify-content: center; }
   .sl-acc-shots figure { display: grid; gap: 6px; margin: 0; }
   .sl-acc-shots span { position: relative; display: block; aspect-ratio: 16 / 10; border-radius: var(--r12); overflow: hidden; background: #ddd; box-shadow: 0 12px 24px -14px rgba(0, 0, 0, 0.4); }
-  .sl-acc-shots img { object-fit: cover; object-position: top; }
   .sl-acc-shots .is-phone span { background: linear-gradient(160deg, #efe9ff, #e7efe9); }
-  .sl-acc-shots .is-phone img { object-fit: contain; padding: 6px 0; }
+  .sl-acc-shots .is-phone :is(img, video) { object-fit: contain; padding: 6px 0; }
   .sl-acc-shots figcaption { font-size: 12px; font-weight: 500; color: var(--soft-l); }
   .sl-acc-link { display: inline-block; margin-bottom: 16px; font-size: 14px; color: var(--orange); }
   .sl-card { display: none; }

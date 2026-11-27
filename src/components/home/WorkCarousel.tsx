@@ -3,11 +3,11 @@
 // release inertia), horizontal wheel and ←/→ feed velocity; position lerps to target (friction 0.9) and snaps
 // when idle. The centred card lifts with a shadow over a soft glow; side cards blur slightly. Ring text turns at half speed.
 import { useRef, useState } from 'react';
-import Image from 'next/image';
 import Link from 'next/link';
 import { gsap, useGSAP, ScrollTrigger, useVelocityCarousel, wrapDist, isMobile, isReduced, EASE } from '@/lib/motion';
 import { PROJECTS, projectLink, type Project } from '@/content/work';
 import { getService } from '@/content/services';
+import { Clip, useClips } from '@/components/ui/Clip';
 
 const N = PROJECTS.length;
 
@@ -23,8 +23,7 @@ function ItemLink({ p, i, onFocus, setRef }: { p: Project; i: number; onFocus: (
       <span className="wc-device">
         {p.device === 'laptop' && <span className="wc-bar" aria-hidden><i /><i /><i /></span>}
         <span className="wc-screen">
-          <Image src={p.device === 'phone' ? p.mobile! : p.desktop} alt="" fill draggable={false}
-            sizes={p.device === 'phone' ? '(max-width: 767px) 40vw, 240px' : '(max-width: 767px) 80vw, 520px'} />
+          <Clip kind={p.device === 'phone' ? 'tall' : 'lg'} slug={p.slug} />
         </span>
       </span>
     </>
@@ -66,6 +65,9 @@ export function WorkCarousel() {
     const c = ((Math.round(pos) % N) + N) % N;
     if (c !== centreRef.current) { centreRef.current = c; setCentre(c); }
   });
+
+  // Only the centred project plays its recording; side cards keep their poster.
+  useClips(root, v => v.closest('.wc-item') === items.current[centreRef.current]);
 
   // Info card + glow react to the new centre.
   useGSAP(() => {
